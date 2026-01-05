@@ -7,21 +7,24 @@ Follow these steps to ensure a smooth, conflict‑free workflow for the whole te
 
 ## 1. Cloning the Repository
 
-You can clone the repo using HTTPS (easiest) or SSH (recommended if you’ve set up SSH keys).
+> [!IMPORTANT]
+> You only need to clone the repo ONCE.
+> This will create the repository on your local machine.
 
-### HTTPS (recommended for beginners)
 
+### HTTPS
+1. Chose where you want the git project to live (e.g. C:\Users\markr\Documents\vscode-projects)
+2. In a Visual Studio Code terminal, navigate to the location you have chosen;
+---
+    cd C:\Users\markr\Documents\vscode-projects
+
+3. In the Visual Studio Code terminal, clone the repository onto your local machine;
+---
     git clone https://github.com/mrosevere/hackathon-elemental-game.git
 
-### SSH (if you have SSH keys configured)
+4. After cloning, browse to the project folder and open it in Visual Studio Code (it may automatically open for you)
 
-    git clone git@github.com:mrosevere/hackathon-elemental-game.git
 
-After cloning, move into the project folder:
-
-    cd hackathon-elemental-game
-
----
 
 ## 2. Keeping Your Local Main Branch Up to Date
 
@@ -38,16 +41,22 @@ This ensures your work starts from the most recent version of the project.
 
 We use the naming convention:
 
-    <issue-number><your-name>
+    <git-project-issue-number>-<your-name>
 
 Examples:
 
     issue-1-mark
     issue-2-abs
 
+The issue number is the auto number assigned to the issue in the Git Project board:
+
+![screenshot of the project board highlighting where the issue number is displayed](../images/doc-images/project-board-image.png)
+
+
+
 To create your branch:
 
-    git checkout -b <issue-number><your-name>
+    git checkout -b <issue-number>-<your-name>
 
 ---
 
@@ -65,7 +74,7 @@ After editing files:
 
 ### Push your branch to GitHub
 
-    git push -u origin <issue-number><your-name>
+    git push -u origin <issue-number>-<your-name>
 
 ---
 
