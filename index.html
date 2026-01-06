@@ -7,8 +7,19 @@
     <meta name="description" content="!!Short description of site!!"> 
     <meta name="keywords" content="!!keyword1, keyword2!!">
 
+    <!-- Favicon / App icons -->
+    <link rel="icon" href="assets/images/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="manifest" href="assets/images/site.webmanifest">
+
     <!-- Link to external CSS -->
      <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Fonts -->
+     <style>
+@import url('https://fonts.googleapis.com/css2?family=Concert+One&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+</style>
 </head>
 
 <body>
@@ -106,6 +117,56 @@
     </div>
   </div>
 
+    <nav class="element-icons" aria-label="Element win/loss chart">
+        <img
+            class="element-icon element-icon--lightning"
+            src="assets/images/lightning.png"
+            alt="Lightning"
+            data-element="lightning"
+            tabindex="0"
+            title="Lightning&#10;Beats: Water, Air&#10;Loses to: Earth, Fire"
+        >
+        <img
+            class="element-icon element-icon--fire"
+            src="assets/images/fire.png"
+            alt="Fire"
+            data-element="fire"
+            tabindex="0"
+            title="Fire&#10;Beats: Air, Earth&#10;Loses to: Water, Lightning"
+        >
+        <img
+            class="element-icon element-icon--air"
+            src="assets/images/air.png"
+            alt="Air"
+            data-element="air"
+            tabindex="0"
+            title="Air&#10;Beats: Earth, Water&#10;Loses to: Fire, Lightning"
+        >
+        <img
+            class="element-icon element-icon--earth"
+            src="assets/images/earth.png"
+            alt="Earth"
+            data-element="earth"
+            tabindex="0"
+            title="Earth&#10;Beats: Lightning, Water&#10;Loses to: Air, Fire"
+        >
+        <img
+            class="element-icon element-icon--water"
+            src="assets/images/water.png"
+            alt="Water"
+            data-element="water"
+            tabindex="0"
+            title="Water&#10;Beats: Fire, Lightning&#10;Loses to: Air, Earth"
+        >
+    </nav>
+
+    <div id="element-tooltip" class="element-tooltip" role="status" aria-live="polite" hidden></div>
+
+    <main class="page-content">
+        <h1>
+            Testing my new branch
+        </h1>
+    </main>
     <!-- link to JavaScript -->
      <script src="assets/js/script.js"></script>
 </body>

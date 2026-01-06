@@ -211,3 +211,114 @@ button img {
   vertical-align: middle;
   margin: 0 4px;
 }
+
+:root {
+	--element-diagram-size: 220px;
+}
+
+.page-content {
+	padding-top: calc(var(--element-diagram-size) + 24px);
+}
+
+body {
+	margin: 0;
+}
+
+.page-content > :first-child {
+	margin-top: 0;
+}
+
+.element-icons {
+	position: fixed;
+	top: 12px;
+	left: 12px;
+	width: var(--element-diagram-size);
+	height: var(--element-diagram-size);
+	border-radius: 50%;
+	z-index: 1000;
+	background: transparent;
+	user-select: none;
+	box-sizing: border-box;
+	/* allow clicks on icons but not on the container */
+	pointer-events: none;
+}
+
+.element-icon {
+	position: absolute;
+	width: 90px;
+	height: 90px;
+	object-fit: contain;
+	cursor: help;
+	pointer-events: auto;
+	--icon-scale: 1;
+	--icon-opacity: 1;
+	opacity: var(--icon-opacity);
+	transform: translate(-50%, -50%) scale(var(--icon-scale));
+	transition: transform 120ms ease, opacity 120ms ease, outline-width 120ms ease;
+	outline: 0 solid CanvasText;
+	outline-offset: 2px;
+}
+
+/* When one icon is active, dim everything by default */
+.element-icons.is-active .element-icon {
+	--icon-opacity: 0.35;
+}
+
+/* Relationship highlighting */
+.element-icon.relation-self {
+	--icon-opacity: 1;
+	--icon-scale: 1.08;
+	outline-width: 3px;
+}
+
+.element-icon.relation-beats {
+	--icon-opacity: 1;
+	outline-width: 3px;
+	outline-style: solid;
+}
+
+.element-icon.relation-loses {
+	--icon-opacity: 1;
+	outline-width: 3px;
+	outline-style: dashed;
+}
+
+.element-tooltip {
+	position: fixed;
+	left: 12px;
+	top: calc(12px + var(--element-diagram-size) + 8px);
+	z-index: 1100;
+	max-width: 280px;
+	padding: 10px 12px;
+	border: 1px solid CanvasText;
+	border-radius: 10px;
+	background: Canvas;
+	color: CanvasText;
+	white-space: pre-line;
+}
+
+/* Pentagram points (vertices around a circle) */
+.element-icon--lightning {
+	left: 50%;
+	top: 8%;
+}
+
+.element-icon--fire {
+	left: 90%;
+	top: 37%;
+}
+
+.element-icon--air {
+	left: 75%;
+	top: 84%;
+}
+
+.element-icon--earth {
+	left: 25%;
+	top: 84%;
+}
+
+.element-icon--water {
+	left: 10%;
+	top: 37%;
+}
