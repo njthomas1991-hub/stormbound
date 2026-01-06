@@ -37,7 +37,51 @@ body {
 	object-fit: contain;
 	cursor: help;
 	pointer-events: auto;
-	transform: translate(-50%, -50%);
+	--icon-scale: 1;
+	--icon-opacity: 1;
+	opacity: var(--icon-opacity);
+	transform: translate(-50%, -50%) scale(var(--icon-scale));
+	transition: transform 120ms ease, opacity 120ms ease, outline-width 120ms ease;
+	outline: 0 solid CanvasText;
+	outline-offset: 2px;
+}
+
+/* When one icon is active, dim everything by default */
+.element-icons.is-active .element-icon {
+	--icon-opacity: 0.35;
+}
+
+/* Relationship highlighting */
+.element-icon.relation-self {
+	--icon-opacity: 1;
+	--icon-scale: 1.08;
+	outline-width: 3px;
+}
+
+.element-icon.relation-beats {
+	--icon-opacity: 1;
+	outline-width: 3px;
+	outline-style: solid;
+}
+
+.element-icon.relation-loses {
+	--icon-opacity: 1;
+	outline-width: 3px;
+	outline-style: dashed;
+}
+
+.element-tooltip {
+	position: fixed;
+	left: 12px;
+	top: calc(12px + var(--element-diagram-size) + 8px);
+	z-index: 1100;
+	max-width: 280px;
+	padding: 10px 12px;
+	border: 1px solid CanvasText;
+	border-radius: 10px;
+	background: Canvas;
+	color: CanvasText;
+	white-space: pre-line;
 }
 
 /* Pentagram points (vertices around a circle) */
