@@ -204,3 +204,12 @@ p img {
   vertical-align: middle;
   margin: 0 4px;
 }
+
+/* INLINE IMAGES IN BUTTONS */
+button img {
+  display: inline;
+  height: 2.5em;
+  width: auto;
+  vertical-align: middle;
+  margin: 0 4px;
+}
