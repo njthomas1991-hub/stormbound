@@ -54,15 +54,6 @@ document.addEventListener("keydown", (e) => {
     allTabs[nextIndex].focus();
     e.preventDefault();
   }
-
-  if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-    const activeTab = modal.querySelector(".tab.active");
-    const allTabs = Array.from(modal.querySelectorAll(".tab"));
-    const currentIndex = allTabs.indexOf(activeTab);
-    const prevIndex = (currentIndex - 1 + allTabs.length) % allTabs.length;
-    allTabs[prevIndex].focus();
-    e.preventDefault();
-  }
 });
 
 // ACCORDION LOGIC
