@@ -34,12 +34,13 @@
           <button class="tab active" data-content="rules">
             Rules
           </button>
-          <button class="tab" data-content="scoring">
-            Scoring and Progress
-          </button>
           <button class="tab" data-content="elements">
             Elements
           </button>
+          <button class="tab" data-content="scoring">
+            Scoring and Progress
+          </button>
+          
         </div>
 
         <!-- RIGHT CONTENT -->
@@ -48,20 +49,25 @@
           <!-- RULES CONTENT -->
           <div class="content-section active" id="rules">
             <h2>Rules</h2>
-            <p>Stormbound: A Battle of the Elements is a modern take on the traditional game 'Rock, Paper Scissors'.</p>
+            <p>Stormbound: A Battle of the Elements is a modern take on the traditional game 'Rock, Paper Scissors'.<br>
+            You choose from the elements: <br>
+             'water'<img src="assets/images/doc-images/water.png" alt="Water">, <br>
+             'fire'<img src="assets/images/doc-images/fire.png" alt="Fire">, <br>
+             'earth'<img src="assets/images/doc-images/earth.png" alt="Earth">, <br>
+             'air'<img src="assets/images/doc-images/air.png" alt="Air">, <br>
+             and 'lightning'<img src="assets/images/doc-images/lightning.png" alt="Lightning">.<br>
+             Once you have choosen your element, the computer will randomly select its own element, after a count down of 3.<br> 
+              </p>
           </div>
 
-          <!-- SCORING AND PROGRESS CONTENT -->
-          <div class="content-section" id="scoring">
-            <h2>Scoring and Progress</h2>
-            <p>Players take turns clockwise.</p>
-          </div>
+          
 
           <!-- ELEMENTS CONTENT -->
           <div class="content-section" id="elements">
             <div class="elements-container">
               <div class="elements-tabs">
                 <h2>Elements</h2>
+                <p>The winner is determined based on the following rules:</p>
                 <button class="sub-header" data-element="water">Water</button>
                 <button class="sub-header" data-element="fire">Fire</button>
                 <button class="sub-header" data-element="earth">Earth</button>
@@ -70,24 +76,34 @@
               </div>
               <div class="elements-content">
                 <div class="element-item active" id="water">
+                  <img src="assets/images/doc-images/water.png" alt="Water">
                   <p>Each win gives 10 points.</p>
                 </div>
                 <div class="element-item" id="fire">
+                  <img src="assets/images/doc-images/fire.png" alt="Fire">
                   <p>Rule violations deduct points.</p>
                 </div>
                 <div class="element-item" id="earth">
+                  <img src="assets/images/doc-images/earth.png" alt="Earth">
                   <p>Rule violations deduct points.</p>
                 </div>
                 <div class="element-item" id="air">
+                  <img src="assets/images/doc-images/air.png" alt="Air">
                   <p>Rule violations deduct points.</p>
                 </div>
                 <div class="element-item" id="lightning">
+                  <img src="assets/images/doc-images/lightning.png" alt="Lightning">
                   <p>Rule violations deduct points.</p>
                 </div>
               </div>
             </div>
           </div>
 
+<!-- SCORING AND PROGRESS CONTENT -->
+          <div class="content-section" id="scoring">
+            <h2>Scoring and Progress</h2>
+            <p>Players take turns clockwise.</p>
+          </div>
         </div>
 
       </div>

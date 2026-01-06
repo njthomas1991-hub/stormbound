@@ -168,10 +168,19 @@ body {
 .element-item {
   display: none;
   width: 100%;
+  text-align: center;
 }
 
 .element-item.active {
   display: block;
+}
+
+.element-item img {
+  width: 1em;
+  height: 1em;
+  margin-bottom: 20px;
+  object-fit: contain;
+  display: inline-block;
 }
 
 /* RIGHT CONTENT */
@@ -185,4 +194,13 @@ body {
 
 .accordion-content.active {
   display: block;
+}
+
+/* INLINE IMAGES IN PARAGRAPHS */
+p img {
+  display: inline;
+  height: 2.5em;
+  width: auto;
+  vertical-align: middle;
+  margin: 0 4px;
 }
