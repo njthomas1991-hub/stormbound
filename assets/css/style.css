@@ -781,7 +781,31 @@ body.light-mode .reset-btn:hover {
         height: 104px;
     }
     
-    .achievements-section {\n        padding: 20px 12px;\n    }\n    \n    .achievements-title {\n        font-size: 1.4rem;\n    }\n    \n    .achievements-grid {\n        gap: 12px;\n    }\n    \n    .achievement-badge {\n        min-width: 100px;\n        padding: 12px;\n    }\n    \n    .badge-icon {\n        font-size: 2.2rem;\n    }\n    \n    .badge-label {\n        font-size: 0.75rem;\n    }\n}
+    .achievements-section {
+        padding: 20px 12px;
+    }
+    
+    .achievements-title {
+        font-size: 1.4rem;
+    }
+    
+    .achievements-grid {
+        gap: 12px;
+    }
+    
+    .achievement-badge {
+        min-width: 100px;
+        padding: 12px;
+    }
+    
+    .badge-icon {
+        font-size: 2.2rem;
+    }
+    
+    .badge-label {
+        font-size: 0.75rem;
+    }
+}
 
 .arena-symbol[data-choice="fire"] { --element-accent: var(--danger); }
 .arena-symbol[data-choice="earth"] { --element-accent: var(--accent-contrast); }
