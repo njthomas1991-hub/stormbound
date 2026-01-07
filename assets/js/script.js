@@ -123,6 +123,33 @@ const ELEMENT_DISPLAY_NAMES = {
 	water: "Water",
 };
 
+const MODE_CONFIG = {
+	continuous: {
+		label: "Continuous",
+		targetWins: null,
+		description: "Continuous play: keep earning points every round.",
+	},
+	bo3: {
+		label: "Best of 3",
+		targetWins: 2,
+		description: "Best of 3: first to 2 wins takes the series.",
+	},
+	bo5: {
+		label: "Best of 5",
+		targetWins: 3,
+		description: "Best of 5: first to 3 wins takes the series.",
+	},
+	bo9: {
+		label: "Best of 9",
+		targetWins: 5,
+		description: "Best of 9: first to 5 wins takes the series.",
+	},
+};
+
+let gameMode = "continuous";
+let targetWins = null;
+let seriesActive = true;
+
 function normalizeElementChoice(choice) {
 	if (typeof choice !== "string") return "";
 	return choice.trim().toLowerCase();
@@ -263,26 +290,40 @@ window.determineWinner = determineWinner;
 ========================================================= */
 let playerScore = 0;
 let computerScore = 0;
+let totalRounds = 0;
 function updateScore(result) {
+	if (!seriesActive && targetWins !== null) return;
 	if (result === "win") {
 		playerScore += 1;
+		totalRounds += 1;
 	} else if (result === "lose") {
 		computerScore += 1;
+		totalRounds += 1;
 	}
 	// Ties don't change either score
 	const scoreEl = document.getElementById("scoreValue");
 	if (scoreEl) scoreEl.textContent = playerScore;
 	const computerScoreEl = document.getElementById("computerScoreValue");
 	if (computerScoreEl) computerScoreEl.textContent = computerScore;
+	const playerRoundEl = document.getElementById("playerRoundValue");
+	if (playerRoundEl) playerRoundEl.textContent = totalRounds;
+	const computerRoundEl = document.getElementById("computerRoundValue");
+	if (computerRoundEl) computerRoundEl.textContent = totalRounds;
 }
 
 function resetScore() {
 	playerScore = 0;
 	computerScore = 0;
+	totalRounds = 0;
+	seriesActive = true;
 	const scoreEl = document.getElementById("scoreValue");
 	if (scoreEl) scoreEl.textContent = playerScore;
 	const computerScoreEl = document.getElementById("computerScoreValue");
 	if (computerScoreEl) computerScoreEl.textContent = computerScore;
+	const playerRoundEl = document.getElementById("playerRoundValue");
+	if (playerRoundEl) playerRoundEl.textContent = totalRounds;
+	const computerRoundEl = document.getElementById("computerRoundValue");
+	if (computerRoundEl) computerRoundEl.textContent = totalRounds;
 }
 
 /* =========================================================
@@ -303,6 +344,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	const cpuSymbolEl = document.getElementById("cpuSymbol");
 	const playerSymbolIcon = document.getElementById("playerSymbolIcon");
 	const cpuSymbolIcon = document.getElementById("cpuSymbolIcon");
+	const modeButtons = Array.from(document.querySelectorAll(".mode-btn"));
+	const modeHintEl = document.getElementById("modeHint");
 
 	if (!arena) return;
 
@@ -386,8 +429,62 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (!enabled) clearPickDisplay();
 	}
 
+	function setModeStatusMessage(config) {
+		if (!statusEl) return;
+		statusEl.textContent = config.targetWins
+			? `${config.label}: first to ${config.targetWins} wins. Press Play to start.`
+			: "Continuous play: press Play to start.";
+	}
+
+	function updateModeUI(activeMode) {
+		modeButtons.forEach((btn) => {
+			const isActive = btn.dataset.mode === activeMode;
+			btn.classList.toggle("is-active", isActive);
+			btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+		});
+		const config = MODE_CONFIG[activeMode] ?? MODE_CONFIG.continuous;
+		if (modeHintEl) modeHintEl.textContent = config.description;
+	}
+
+	function setMode(nextMode, options = {}) {
+		const preserveActive = options.preserveActive ?? true;
+		const config = MODE_CONFIG[nextMode] ?? MODE_CONFIG.continuous;
+		gameMode = nextMode;
+		targetWins = config.targetWins;
+		resetScore();
+		seriesActive = true;
+		updateModeUI(gameMode);
+		const wasActive = arena.classList.contains("is-active");
+		if (!preserveActive || !wasActive) {
+			setArenaEnabled(false);
+		} else {
+			setArenaEnabled(true);
+		}
+		setModeStatusMessage(config);
+	}
+
+	function checkSeriesWinner() {
+		if (targetWins === null) return null;
+		if (playerScore >= targetWins) return "player";
+		if (computerScore >= targetWins) return "computer";
+		return null;
+	}
+
+	function concludeSeries(winner) {
+		seriesActive = false;
+		choices.forEach((btn) => (btn.disabled = true));
+		const label = MODE_CONFIG[gameMode]?.label || "Series";
+		if (statusEl) {
+			statusEl.textContent = winner === "player"
+				? `You win the ${label}! Press Reset or pick another mode to play again.`
+				: `Computer wins the ${label}. Press Reset or pick another mode to play again.`;
+		}
+	}
+
 	// Initially disabled until Play is clicked.
 	setArenaEnabled(false);
+	updateModeUI(gameMode);
+	setModeStatusMessage(MODE_CONFIG[gameMode]);
 
 	function focusFirstChoice() {
 		const firstChoice = arena.querySelector(".arena-choice");
@@ -407,6 +504,15 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 		});
 	}
+
+	modeButtons.forEach((btn) => {
+		btn.addEventListener("click", () => {
+			// When switching modes, clear any existing choice/result visuals
+			// and reset the series, requiring Play to be clicked again.
+			clearChoiceEffects();
+			setMode(btn.dataset.mode, { preserveActive: false });
+		});
+	});
 
 	// Element choice interactions using existing game logic.
 	function clearChoiceEffects() {
@@ -439,6 +545,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	choices.forEach((btn) => {
 		btn.addEventListener("click", () => {
+			if (!seriesActive && targetWins !== null) {
+				if (statusEl) statusEl.textContent = "Series finished. Press Reset or pick another mode to play again.";
+				return;
+			}
+
 			const player = btn.dataset.choice;
 			const opponent = getComputerChoice();
 			const outcome = determineWinner(player, opponent);
@@ -476,10 +587,23 @@ document.addEventListener("DOMContentLoaded", () => {
 				restartResultAnimation(cpuSymbolEl, "result-win");
 			}
 
-			if (statusEl) {
-				statusEl.textContent = `You chose ${name(player)}. Computer chose ${name(opponent)}. Result: ${outcome.toUpperCase()}.`;
-			}
 			updateScore(outcome);
+			const summary = `You chose ${name(player)}. Computer chose ${name(opponent)}. Result: ${outcome.toUpperCase()}.`;
+			const seriesWinner = checkSeriesWinner();
+			if (seriesWinner) {
+				if (statusEl) {
+					const label = MODE_CONFIG[gameMode]?.label || "series";
+					const winnerText = seriesWinner === "player" ? "You win" : "Computer wins";
+					statusEl.textContent = `${summary} ${winnerText} the ${label}.`;
+				}
+				concludeSeries(seriesWinner);
+				return;
+			}
+
+			if (statusEl) {
+				const seriesNote = targetWins !== null ? ` Series score: ${playerScore}-${computerScore}.` : "";
+				statusEl.textContent = `${summary}${seriesNote}`;
+			}
 		});
 	});
 
@@ -496,11 +620,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			// Clear pick displays
 			clearPickDisplay();
 			
-			// Reset status message
-			if (statusEl) statusEl.textContent = "Arena ready. Choose your element.";
-			
-			// Focus first choice for accessibility
-			focusFirstChoice();
+			// Reset arena state to require a new Play press
+			setArenaEnabled(false);
+			setModeStatusMessage(MODE_CONFIG[gameMode]);
 		});
 	}
 });
