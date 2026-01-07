@@ -323,11 +323,8 @@ function resetScore() {
 	if (scoreEl) scoreEl.textContent = playerScore;
 	const computerScoreEl = document.getElementById("computerScoreValue");
 	if (computerScoreEl) computerScoreEl.textContent = computerScore;
-	// Round displays show individual win counts per player
-	const playerRoundEl = document.getElementById("playerRoundValue");
-	if (playerRoundEl) playerRoundEl.textContent = playerScore;
-	const computerRoundEl = document.getElementById("computerRoundValue");
-	if (computerRoundEl) computerRoundEl.textContent = computerScore;
+	const roundEl = document.getElementById("roundValue");
+	if (roundEl) roundEl.textContent = totalRounds;
 }
 
 /* =========================================================
