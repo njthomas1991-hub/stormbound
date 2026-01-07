@@ -210,10 +210,6 @@ body.light-mode .rules-btn:hover {
     position: relative;
 }
 
-.game-arena.active {
-    display: block;
-}
-
 .arena-header h3 {
     margin: 0 0 6px;
 }
@@ -226,6 +222,17 @@ body.light-mode .rules-btn:hover {
     transition: opacity var(--transition-med), filter var(--transition-med), transform var(--transition-med);
 }
 
+@media (max-width: 900px) {
+    .arena-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .arena-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
 .arena-choice {
     display: flex;
     align-items: center;
@@ -608,4 +615,28 @@ body.light-mode .game-arena {
     background: #ffffff;
     color: #222;
     border: 1px solid #ccc;
+}
+
+body.light-mode .arena-overlay {
+    /* Keep a dimming layer in light mode while matching overall theme */
+    background: rgba(0, 0, 0, 0.35);
+}
+
+body.light-mode .overlay-inner {
+    background: #ffffff;
+    color: #222;
+    border: 1px solid #ccc;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+body.light-mode .arena-choice {
+    background: #f5f7ff;
+    color: #222;
+    border: 1px solid #d0d7e2;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .arena-choice:hover {
+    border-color: #4a8cff;
+    background: #e4edff;
 }
