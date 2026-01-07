@@ -459,23 +459,20 @@ function scheduleAutoReset() {
 }
 
 function loadAchievements() {
-	// Load achievements from sessionStorage so they persist for the tab
-	// but are cleared when the browser/tab is closed.
-	const saved = sessionStorage.getItem('stormbound-achievements');
+	const saved = localStorage.getItem('stormbound-achievements');
 	if (saved) {
 		try {
 			const parsed = JSON.parse(saved);
 			Object.assign(ACHIEVEMENTS, parsed);
 		} catch (e) {
-			console.error('Failed to load achievements from sessionStorage:', e);
+			console.error('Failed to load achievements:', e);
 		}
 	}
 	updateAchievementBadges();
 }
 
 function saveAchievements() {
-	// Persist achievements for the current browser tab/session only
-	sessionStorage.setItem('stormbound-achievements', JSON.stringify(ACHIEVEMENTS));
+	localStorage.setItem('stormbound-achievements', JSON.stringify(ACHIEVEMENTS));
 }
 
 function unlockAchievement(achievementKey) {
