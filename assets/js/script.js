@@ -399,11 +399,9 @@ function updateScore(result) {
 	if (scoreEl) scoreEl.textContent = playerScore;
 	const computerScoreEl = document.getElementById("computerScoreValue");
 	if (computerScoreEl) computerScoreEl.textContent = computerScore;
-	// Round displays show individual win counts per player
-	const playerRoundEl = document.getElementById("playerRoundValue");
-	if (playerRoundEl) playerRoundEl.textContent = playerScore;
-	const computerRoundEl = document.getElementById("computerRoundValue");
-	if (computerRoundEl) computerRoundEl.textContent = computerScore;
+	// Update round counter display
+	const roundEl = document.getElementById("roundValue");
+	if (roundEl) roundEl.textContent = totalRounds;
 }
 
 function resetScore() {
@@ -539,8 +537,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	function setModeStatusMessage(config) {
 		if (!statusEl) return;
 		statusEl.textContent = config.targetWins
-			? `${config.label}: first to ${config.targetWins} wins. Choose your element to start.`
-			: "Continuous play: choose your element to start.";
+			? `${config.label}: first to ${config.targetWins} wins. Press Play to start.`
+			: "Continuous play: press Play to start.";
 	}
 
 	function updateModeUI(activeMode) {
@@ -554,15 +552,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function setMode(nextMode, options = {}) {
-		const preserveActive = options.preserveActive ?? true;
 		const config = MODE_CONFIG[nextMode] ?? MODE_CONFIG.continuous;
 		gameMode = nextMode;
 		targetWins = config.targetWins;
 		resetScore();
 		seriesActive = true;
 		updateModeUI(gameMode);
-		// Always activate arena when mode is selected
-		setArenaEnabled(true);
 		setModeStatusMessage(config);
 	}
 
@@ -596,8 +591,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		}, 800);
 	}
 
-	// Initially active with default mode
-	setArenaEnabled(true);
+	// Initially disabled - show play overlay
+	setArenaEnabled(false);
 	updateModeUI(gameMode);
 	setModeStatusMessage(MODE_CONFIG[gameMode]);
 
@@ -737,8 +732,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			// Clear pick displays
 			clearPickDisplay();
 			
-			// Keep arena active
-			setArenaEnabled(true);
+			// Show play overlay again
+			setArenaEnabled(false);
 			setModeStatusMessage(MODE_CONFIG[gameMode]);
 		});
 	}
