@@ -532,15 +532,15 @@ document.addEventListener("DOMContentLoaded", () => {
 		arena.classList.toggle("is-active", !!enabled);
 		if (statusEl) statusEl.textContent = enabled
 			? "Arena ready. Choose your element."
-			: "Press Play to start the battle.";
+			: "Select a game mode to begin.";
 		if (!enabled) clearPickDisplay();
 	}
 
 	function setModeStatusMessage(config) {
 		if (!statusEl) return;
 		statusEl.textContent = config.targetWins
-			? `${config.label}: first to ${config.targetWins} wins. Press Play to start.`
-			: "Continuous play: press Play to start.";
+			? `${config.label}: first to ${config.targetWins} wins. Choose your element to start.`
+			: "Continuous play: choose your element to start.";
 	}
 
 	function updateModeUI(activeMode) {
@@ -561,12 +561,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		resetScore();
 		seriesActive = true;
 		updateModeUI(gameMode);
-		const wasActive = arena.classList.contains("is-active");
-		if (!preserveActive || !wasActive) {
-			setArenaEnabled(false);
-		} else {
-			setArenaEnabled(true);
-		}
+		// Always activate arena when mode is selected
+		setArenaEnabled(true);
 		setModeStatusMessage(config);
 	}
 
@@ -600,8 +596,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		}, 800);
 	}
 
-	// Initially disabled until Play is clicked.
-	setArenaEnabled(false);
+	// Initially active with default mode
+	setArenaEnabled(true);
 	updateModeUI(gameMode);
 	setModeStatusMessage(MODE_CONFIG[gameMode]);
 
@@ -627,9 +623,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	modeButtons.forEach((btn) => {
 		btn.addEventListener("click", () => {
 			// When switching modes, clear any existing choice/result visuals
-			// and reset the series, requiring Play to be clicked again.
+			// and reset the series, arena stays active
 			clearChoiceEffects();
-			setMode(btn.dataset.mode, { preserveActive: false });
+			setMode(btn.dataset.mode);
 		});
 	});
 
@@ -741,8 +737,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			// Clear pick displays
 			clearPickDisplay();
 			
-			// Reset arena state to require a new Play press
-			setArenaEnabled(false);
+			// Keep arena active
+			setArenaEnabled(true);
 			setModeStatusMessage(MODE_CONFIG[gameMode]);
 		});
 	}
