@@ -847,9 +847,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 	// Initialize progress display on load (function defined in global scope)
-	document.addEventListener('DOMContentLoaded', () => {
-		updateBadgeProgress(gameMode);
-	});
+	updateBadgeProgress(gameMode);
 
 	if (playBtn) {
 		playBtn.addEventListener("click", () => {
