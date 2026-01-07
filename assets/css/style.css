@@ -385,6 +385,7 @@ body.light-mode .rules-btn:hover {
 
 /* Initial locked state: hide/blur content until Play */
 .game-arena:not(.is-active) .arena-grid,
+.game-arena:not(.is-active) .arena-picks,
 .game-arena:not(.is-active) .arena-status {
     opacity: 0;
     filter: blur(2px);
@@ -393,10 +394,95 @@ body.light-mode .rules-btn:hover {
 }
 
 .game-arena.is-active .arena-grid,
+.game-arena.is-active .arena-picks,
 .game-arena.is-active .arena-status {
     opacity: 1;
     filter: none;
     transform: none;
+}
+
+/* Under-buttons selection display */
+.arena-picks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+    transition: opacity var(--transition-med), filter var(--transition-med), transform var(--transition-med);
+}
+
+@media (max-width: 600px) {
+    .arena-picks {
+        grid-template-columns: 1fr;
+    }
+}
+
+.arena-pick {
+    position: relative;
+    border-radius: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-subtle);
+    background: radial-gradient(circle at 0 0, rgba(0, 224, 255, 0.06) 0, rgba(3, 5, 14, 0.98) 65%);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    min-height: 54px;
+    transition: transform var(--transition-fast), box-shadow var(--transition-med), border-color var(--transition-med), filter var(--transition-med);
+    --element-accent: var(--accent);
+    will-change: transform;
+}
+
+.arena-pick__label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.arena-pick__value {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.arena-pick__icon {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
+.arena-pick--player {
+    border-color: rgba(0, 224, 255, 0.18);
+}
+
+.arena-pick--cpu {
+    border-color: rgba(255, 204, 102, 0.18);
+}
+
+.arena-pick[data-choice="fire"] { --element-accent: var(--danger); }
+.arena-pick[data-choice="earth"] { --element-accent: var(--accent-contrast); }
+.arena-pick[data-choice="air"] { --element-accent: var(--neutral); }
+.arena-pick[data-choice="water"] { --element-accent: var(--accent); }
+.arena-pick[data-choice="lightning"] { --element-accent: var(--accent); }
+
+/* Apply same result animations to the pick cards */
+.arena-pick.result-win {
+    --result-scale: 1.03;
+    --result-tilt: -0.5deg;
+    animation: arena-result-win 650ms ease-out 1;
+    box-shadow: 0 0 0 1px rgba(0, 224, 255, 0.12), 0 14px 30px rgba(0, 0, 0, 0.55);
+    filter: drop-shadow(0 0 10px var(--element-accent));
+}
+
+.arena-pick.result-lose {
+    --result-shake: 4px;
+    animation: arena-result-lose 520ms ease-out 1;
+    filter: grayscale(0.25) saturate(0.85);
+}
+
+.arena-pick.result-tie {
+    animation: arena-result-tie 480ms ease-out 1;
 }
 
 /* ========== ARENA OVERLAY ========== */

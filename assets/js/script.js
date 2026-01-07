@@ -266,10 +266,55 @@ document.addEventListener("DOMContentLoaded", () => {
 	const overlay = document.getElementById("arenaOverlay");
 	const playBtn = document.getElementById("playButton");
 	const statusEl = document.getElementById("arenaStatus");
+	const playerPickEl = document.getElementById("playerPick");
+	const cpuPickEl = document.getElementById("cpuPick");
+	const playerPickIcon = document.getElementById("playerPickIcon");
+	const cpuPickIcon = document.getElementById("cpuPickIcon");
+	const playerPickText = document.getElementById("playerPickText");
+	const cpuPickText = document.getElementById("cpuPickText");
 
 	if (!arena) return;
 
 	const choices = Array.from(arena.querySelectorAll(".arena-choice"));
+	const name = (k) => ELEMENT_DISPLAY_NAMES[k] || k;
+
+	function clearPickDisplay() {
+		if (playerPickEl) {
+			playerPickEl.removeAttribute("data-choice");
+			playerPickEl.classList.remove("result-win", "result-lose", "result-tie");
+		}
+		if (cpuPickEl) {
+			cpuPickEl.removeAttribute("data-choice");
+			cpuPickEl.classList.remove("result-win", "result-lose", "result-tie");
+		}
+		if (playerPickText) playerPickText.textContent = "—";
+		if (cpuPickText) cpuPickText.textContent = "—";
+		if (playerPickIcon) {
+			playerPickIcon.hidden = true;
+			playerPickIcon.setAttribute("src", "");
+			playerPickIcon.setAttribute("alt", "");
+		}
+		if (cpuPickIcon) {
+			cpuPickIcon.hidden = true;
+			cpuPickIcon.setAttribute("src", "");
+			cpuPickIcon.setAttribute("alt", "");
+		}
+	}
+
+	function updatePickDisplay(side, choiceKey) {
+		const pickEl = side === "player" ? playerPickEl : cpuPickEl;
+		const iconEl = side === "player" ? playerPickIcon : cpuPickIcon;
+		const textEl = side === "player" ? playerPickText : cpuPickText;
+
+		if (pickEl) pickEl.dataset.choice = choiceKey;
+		if (textEl) textEl.textContent = name(choiceKey);
+
+		if (iconEl) {
+			iconEl.hidden = false;
+			iconEl.src = `assets/images/${choiceKey}.png`;
+			iconEl.alt = name(choiceKey);
+		}
+	}
 
 	function setArenaEnabled(enabled) {
 		choices.forEach((btn) => (btn.disabled = !enabled));
@@ -278,6 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (statusEl) statusEl.textContent = enabled
 			? "Arena ready. Choose your element."
 			: "Press Play to start the battle.";
+		if (!enabled) clearPickDisplay();
 	}
 
 	// Initially disabled until Play is clicked.
@@ -313,6 +359,8 @@ document.addEventListener("DOMContentLoaded", () => {
 				"result-tie"
 			);
 		}
+		if (playerPickEl) playerPickEl.classList.remove("result-win", "result-lose", "result-tie");
+		if (cpuPickEl) cpuPickEl.classList.remove("result-win", "result-lose", "result-tie");
 	}
 
 	function restartResultAnimation(el, className) {
@@ -332,23 +380,30 @@ document.addEventListener("DOMContentLoaded", () => {
 			const player = btn.dataset.choice;
 			const opponent = getComputerChoice();
 			const outcome = determineWinner(player, opponent);
-			const name = (k) => ELEMENT_DISPLAY_NAMES[k] || k;
 
 			clearChoiceEffects();
 			const opponentBtn = findChoiceButton(opponent);
 
 			btn.classList.add("is-player");
 			if (opponentBtn) opponentBtn.classList.add("is-opponent");
+			updatePickDisplay("player", player);
+			updatePickDisplay("cpu", opponent);
 
 			if (outcome === "tie") {
 				restartResultAnimation(btn, "result-tie");
 				restartResultAnimation(opponentBtn, "result-tie");
+				restartResultAnimation(playerPickEl, "result-tie");
+				restartResultAnimation(cpuPickEl, "result-tie");
 			} else if (outcome === "win") {
 				restartResultAnimation(btn, "result-win");
 				restartResultAnimation(opponentBtn, "result-lose");
+				restartResultAnimation(playerPickEl, "result-win");
+				restartResultAnimation(cpuPickEl, "result-lose");
 			} else {
 				restartResultAnimation(btn, "result-lose");
 				restartResultAnimation(opponentBtn, "result-win");
+				restartResultAnimation(playerPickEl, "result-lose");
+				restartResultAnimation(cpuPickEl, "result-win");
 			}
 
 			if (statusEl) {
