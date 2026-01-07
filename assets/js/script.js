@@ -76,17 +76,23 @@ function getComputerChoice() {
 }
 
 // ACCORDION LOGIC
-function showTab(tabIndex) {
-  tabs.forEach(t => t.classList.remove("active"));
-  sections.forEach(s => s.classList.remove("active"));
+const tabs = Array.from(document.querySelectorAll(".accordion .tab"));
+const sections = Array.from(document.querySelectorAll(".accordion .content-section"));
 
-    tabs[i].classList.add("active");
-    const target = tabs[i].dataset.content;
-    document.getElementById(target).classList.add("active");
+function showTab(tabIndex) {
+	tabs.forEach((t) => t.classList.remove("active"));
+	sections.forEach((s) => s.classList.remove("active"));
+
+	const tab = tabs[tabIndex];
+	if (!tab) return;
+	tab.classList.add("active");
+	const target = tab.dataset.content;
+	const section = target ? document.getElementById(target) : null;
+	if (section) section.classList.add("active");
 }
 
 tabs.forEach((tab, i) => {
-    tab.addEventListener("click", () => showTab(i));
+	tab.addEventListener("click", () => showTab(i));
 });
 
 /* =========================================================
@@ -238,3 +244,59 @@ window.determineWinner = determineWinner;
 		navEl.addEventListener("mouseleave", () => clearRelations(navEl, icons, tooltipEl));
 	});
 })();
+
+/* =========================================================
+   ARENA INITIALIZATION WITH LOCAL OVERLAY
+========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+	const arena = document.getElementById("game-arena");
+	const overlay = document.getElementById("arenaOverlay");
+	const playBtn = document.getElementById("playButton");
+	const statusEl = document.getElementById("arenaStatus");
+
+	if (!arena) return;
+
+	const choices = Array.from(arena.querySelectorAll(".arena-choice"));
+
+	function setArenaEnabled(enabled) {
+		choices.forEach((btn) => (btn.disabled = !enabled));
+		if (overlay) overlay.classList.toggle("hidden", !!enabled);
+		arena.classList.toggle("is-active", !!enabled);
+		if (statusEl) statusEl.textContent = enabled
+			? "Arena ready. Choose your element."
+			: "Press Play to start the battle.";
+	}
+
+	// Initially disabled until Play is clicked.
+	setArenaEnabled(false);
+
+	function focusFirstChoice() {
+		const firstChoice = arena.querySelector(".arena-choice");
+		if (firstChoice) firstChoice.focus();
+	}
+
+	if (playBtn) {
+		playBtn.addEventListener("click", () => {
+			setArenaEnabled(true);
+			focusFirstChoice();
+		});
+		playBtn.addEventListener("keydown", (e) => {
+			if (e.key === "Enter" || e.key === " ") {
+				e.preventDefault();
+				setArenaEnabled(true);
+				focusFirstChoice();
+			}
+		});
+	}
+
+	// Element choice interactions using existing game logic.
+	choices.forEach((btn) => {
+		btn.addEventListener("click", () => {
+			const player = btn.dataset.choice;
+			const opponent = getComputerChoice().toLowerCase();
+			const outcome = determineWinner(player, opponent);
+			const name = (k) => ({ water: "Water", fire: "Fire", earth: "Earth", air: "Air", lightning: "Lightning" }[k] || k);
+			if (statusEl) statusEl.textContent = `You chose ${name(player)}. Computer chose ${name(opponent)}. Result: ${outcome.toUpperCase()}.`;
+		});
+	});
+});

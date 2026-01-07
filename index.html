@@ -145,6 +145,29 @@
 
 </main>
 
+<!-- GAME ARENA (below main, above footer) -->
+<section id="game-arena" class="game-arena">
+    <div class="arena-header">
+        <h3>Game Arena</h3>
+        <p>Select an element to challenge the computer.</p>
+    </div>
+    <!-- Local arena overlay with Play button -->
+    <div id="arenaOverlay" class="arena-overlay" aria-label="Activate Game">
+        <div class="overlay-inner">
+            <h4>Ready to Play?</h4>
+            <button id="playButton" class="play-btn" aria-controls="game-arena">Play</button>
+        </div>
+    </div>
+    <div class="arena-grid">
+        <button class="arena-choice" data-choice="water">Water <img src="assets/images/water.png" alt="Water"></button>
+        <button class="arena-choice" data-choice="fire">Fire <img src="assets/images/fire.png" alt="Fire"></button>
+        <button class="arena-choice" data-choice="earth">Earth <img src="assets/images/earth.png" alt="Earth"></button>
+        <button class="arena-choice" data-choice="air">Air <img src="assets/images/air.png" alt="Air"></button>
+        <button class="arena-choice" data-choice="lightning">Lightning <img src="assets/images/lightning.png" alt="Lightning"></button>
+    </div>
+    <div class="arena-status" id="arenaStatus" aria-live="polite"></div>
+</section>
+
 <footer class="site-footer">
     <div class="footer-left">
         <p>© 2026 Stormbound - Battle of the Elements</p>
