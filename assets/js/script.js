@@ -56,6 +56,17 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+// Random selector for the Computer's turn
+function getComputerChoice() {
+    const choices = ['Fire', 'Earth', 'Water', 'Air', 'Lightning'];
+    
+    // Generate a random index between 0 and 4
+    const randomIndex = Math.floor(Math.random() * choices.length);
+    
+    // Return the choice at the random index
+    return choices[randomIndex];
+}
+
 // ACCORDION LOGIC
 function showTab(tabIndex) {
   tabs.forEach(t => t.classList.remove("active"));
