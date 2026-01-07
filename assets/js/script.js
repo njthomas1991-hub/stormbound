@@ -299,14 +299,19 @@ function updateScore(result) {
 	} else if (result === "lose") {
 		computerScore += 1;
 		totalRounds += 1;
+	} else if (result === "tie") {
+		// Ties should count as rounds played
+		totalRounds += 1;
 	}
-	// Ties don't change either score
 	const scoreEl = document.getElementById("scoreValue");
 	if (scoreEl) scoreEl.textContent = playerScore;
 	const computerScoreEl = document.getElementById("computerScoreValue");
 	if (computerScoreEl) computerScoreEl.textContent = computerScore;
-	const roundEl = document.getElementById("roundValue");
-	if (roundEl) roundEl.textContent = totalRounds;
+	// Round displays show individual win counts per player
+	const playerRoundEl = document.getElementById("playerRoundValue");
+	if (playerRoundEl) playerRoundEl.textContent = playerScore;
+	const computerRoundEl = document.getElementById("computerRoundValue");
+	if (computerRoundEl) computerRoundEl.textContent = computerScore;
 }
 
 function resetScore() {
@@ -509,8 +514,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			setMode(btn.dataset.mode, { preserveActive: false });
 		});
 	});
-
-	setMode(gameMode, { preserveActive: false });
 
 	// Element choice interactions using existing game logic.
 	function clearChoiceEffects() {
