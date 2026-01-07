@@ -218,7 +218,14 @@
 <!-- GAME ARENA (below rules button, above footer) -->
 <section id="game-arena" class="game-arena">
     <div class="arena-header">
-        <h3>Game Arena</h3>
+        <h3>Stormbound</h3>
+            <div class="mode-toggle" role="group" aria-label="Select game mode">
+                <button class="mode-btn is-active" data-mode="continuous">Continuous</button>
+                <button class="mode-btn" data-mode="bo3">Best of 3</button>
+                <button class="mode-btn" data-mode="bo5">Best of 5</button>
+                <button class="mode-btn" data-mode="bo9">Best of 9</button>
+            </div>
+            <p id="modeHint" class="mode-hint">Continuous play: keep earning points every round.</p>
         <p>Select an element to challenge the computer.</p>
     </div>
     <!-- Local arena overlay with Play button -->
@@ -264,12 +271,14 @@
     </div>
     <div class="arena-status" id="arenaStatus" aria-live="polite"></div>
     <div class="score-box" id="scoreBox">
-        <p class="score-label">Score</p>
-        <p class="score-value" id="scoreValue">0</p>
+        <p class="score-label">Player Score</p>
+        <p class="round-value">Round <span id="playerRoundValue">0</span></p>
+        <p class="score-value">Score <span id="scoreValue">0</span></p>
     </div>
     <div class="score-box score-box-opponent" id="computerScoreBox">
-        <p class="score-label">Computer</p>
-        <p class="score-value" id="computerScoreValue">0</p>
+        <p class="score-label">Computer Score</p>
+        <p class="round-value">Round <span id="computerRoundValue">0</span></p>
+        <p class="score-value">Score <span id="computerScoreValue">0</span></p>
     </div>
     <button id="resetButton" class="reset-btn">Reset Game</button>
 </section>

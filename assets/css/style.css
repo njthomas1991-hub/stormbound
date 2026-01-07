@@ -228,6 +228,62 @@ body.light-mode .rules-btn:hover {
     margin: 0;
 }
 
+.mode-toggle {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 10px 0 6px;
+}
+
+.mode-btn {
+    padding: 10px 14px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-subtle);
+    background: radial-gradient(circle at 10% 0, rgba(0, 224, 255, 0.12) 0, rgba(4, 6, 12, 0.92) 70%);
+    color: var(--text-main);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-med), transform var(--transition-fast);
+}
+
+.mode-btn:hover,
+.mode-btn:focus-visible {
+    border-color: rgba(0, 224, 255, 0.45);
+    box-shadow: 0 0 0 1px rgba(0, 224, 255, 0.25), 0 10px 24px rgba(0, 0, 0, 0.55);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.mode-btn.is-active {
+    border-color: rgba(0, 224, 255, 0.55);
+    background: radial-gradient(circle at 10% 0, rgba(0, 224, 255, 0.18) 0, rgba(6, 10, 18, 0.96) 70%);
+    box-shadow: 0 0 0 1px rgba(0, 224, 255, 0.35), 0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .mode-btn {
+    background: #e9edf5;
+    color: #1b1e26;
+    border: 1px solid #bfc8d6;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .mode-btn.is-active {
+    border-color: #3b8dff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+.mode-hint {
+    margin: 0 0 4px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
 .arena-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -436,6 +492,11 @@ body.light-mode .rules-btn:hover {
     border-color: rgba(255, 75, 110, 0.35);
 }
 
+.score-box-opponent .round-value {
+    color: var(--danger);
+    text-shadow: 0 0 8px rgba(255, 75, 110, 0.6);
+}
+
 .score-box-opponent .score-value {
     color: var(--danger);
     text-shadow: 0 0 8px rgba(255, 75, 110, 0.6);
@@ -448,6 +509,14 @@ body.light-mode .rules-btn:hover {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--text-muted);
+}
+
+.round-value {
+    margin: 4px 0 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-shadow: 0 0 8px rgba(0, 224, 255, 0.6);
 }
 
 .score-value {
