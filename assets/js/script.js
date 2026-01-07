@@ -19,6 +19,11 @@ const modal = document.getElementById("rulesModal");
 const openBtn = document.getElementById("openModal");
 const closeBtn = document.getElementById("closeModal");
 
+const resultModal = document.getElementById("resultModal");
+const closeResultBtn = document.getElementById("closeResultModal");
+const resultMessage = document.getElementById("resultMessage");
+const resultSubtext = document.getElementById("resultSubtext");
+
 let lastFocusedElement = null;
 
 function openModal() {
@@ -42,6 +47,41 @@ closeBtn.addEventListener("click", closeModal);
 modal.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();
 });
+
+function openResultModal(playerWon, modeName) {
+    if (!resultModal || !resultMessage || !resultSubtext) return;
+    
+    const modalContent = resultModal.querySelector('.result-modal-content');
+    if (modalContent) {
+        modalContent.classList.remove('player-won', 'player-lost');
+        modalContent.classList.add(playerWon ? 'player-won' : 'player-lost');
+    }
+    
+    resultMessage.textContent = playerWon ? "You Won!" : "Try Again";
+    resultSubtext.textContent = playerWon 
+        ? `Congratulations! You won the ${modeName}!`
+        : `The computer won the ${modeName}. Better luck next time!`;
+    
+    resultModal.classList.add("open");
+    
+    setTimeout(() => {
+        if (closeResultBtn) closeResultBtn.focus();
+    }, 100);
+}
+
+function closeResultModal() {
+    if (resultModal) resultModal.classList.remove("open");
+}
+
+if (closeResultBtn) {
+    closeResultBtn.addEventListener("click", closeResultModal);
+}
+
+if (resultModal) {
+    resultModal.addEventListener("click", (e) => {
+        if (e.target === resultModal) closeResultModal();
+    });
+}
 
 /* =========================================================
    KEYBOARD NAVIGATION
@@ -291,11 +331,63 @@ window.determineWinner = determineWinner;
 let playerScore = 0;
 let computerScore = 0;
 let totalRounds = 0;
+
+/* =========================================================
+   ACHIEVEMENT TRACKING
+========================================================= */
+const ACHIEVEMENTS = {
+	'first-win': false,
+	'bo3': false,
+	'bo5': false,
+	'bo9': false
+};
+
+function loadAchievements() {
+	const saved = localStorage.getItem('stormbound-achievements');
+	if (saved) {
+		try {
+			const parsed = JSON.parse(saved);
+			Object.assign(ACHIEVEMENTS, parsed);
+		} catch (e) {
+			console.error('Failed to load achievements:', e);
+		}
+	}
+	updateAchievementBadges();
+}
+
+function saveAchievements() {
+	localStorage.setItem('stormbound-achievements', JSON.stringify(ACHIEVEMENTS));
+}
+
+function unlockAchievement(achievementKey) {
+	if (ACHIEVEMENTS[achievementKey]) return; // Already unlocked
+	ACHIEVEMENTS[achievementKey] = true;
+	saveAchievements();
+	updateAchievementBadges();
+}
+
+function updateAchievementBadges() {
+	const badges = document.querySelectorAll('.achievement-badge');
+	badges.forEach(badge => {
+		const achievement = badge.dataset.achievement;
+		if (ACHIEVEMENTS[achievement]) {
+			badge.classList.add('unlocked');
+		} else {
+			badge.classList.remove('unlocked');
+		}
+	});
+}
+
+// Load achievements on page load
+document.addEventListener('DOMContentLoaded', loadAchievements);
+
 function updateScore(result) {
 	if (!seriesActive && targetWins !== null) return;
 	if (result === "win") {
 		playerScore += 1;
 		totalRounds += 1;
+		// Unlock first win achievement
+		unlockAchievement('first-win');
 	} else if (result === "lose") {
 		computerScore += 1;
 		totalRounds += 1;
@@ -493,6 +585,18 @@ document.addEventListener("DOMContentLoaded", () => {
 				? `You win the ${label}! Press Reset or pick another mode to play again.`
 				: `Computer wins the ${label}. Press Reset or pick another mode to play again.`;
 		}
+		
+		// Unlock achievement if player won
+		if (winner === "player") {
+			if (gameMode === "bo3") unlockAchievement('bo3');
+			else if (gameMode === "bo5") unlockAchievement('bo5');
+			else if (gameMode === "bo9") unlockAchievement('bo9');
+		}
+		
+		// Show result modal with a slight delay for better UX
+		setTimeout(() => {
+			openResultModal(winner === "player", label);
+		}, 800);
 	}
 
 	// Initially disabled until Play is clicked.
