@@ -1268,7 +1268,8 @@ body.light-mode .reset-btn:hover {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('../images/logo.png');
+    /* Prefer optimized WebP for faster loading; fallback file logo.png still present */
+    background-image: url('../images/logo.webp');
     background-repeat: no-repeat;
     background-position: center center;
     /* Fill the arena area while preserving aspect ratio */
