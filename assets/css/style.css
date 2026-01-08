@@ -1269,6 +1269,7 @@ body.light-mode .reset-btn:hover {
     position: absolute;
     inset: 0;
     /* Prefer optimized WebP for faster loading; fallback file logo.png still present */
+    background-image: url('../images/logo.png');
     background-image: url('../images/logo.webp');
     background-repeat: no-repeat;
     background-position: center center;
