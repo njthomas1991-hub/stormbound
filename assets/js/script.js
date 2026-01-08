@@ -459,7 +459,7 @@ function scheduleAutoReset() {
 }
 
 function loadAchievements() {
-	const saved = localStorage.getItem('stormbound-achievements');
+	const saved = sessionStorage.getItem('stormbound-achievements');
 	if (saved) {
 		try {
 			const parsed = JSON.parse(saved);
@@ -472,7 +472,7 @@ function loadAchievements() {
 }
 
 function saveAchievements() {
-	localStorage.setItem('stormbound-achievements', JSON.stringify(ACHIEVEMENTS));
+	sessionStorage.setItem('stormbound-achievements', JSON.stringify(ACHIEVEMENTS));
 }
 
 function unlockAchievement(achievementKey) {
@@ -481,9 +481,143 @@ function unlockAchievement(achievementKey) {
 	saveAchievements();
 	updateAchievementBadges();
 
-	// When a badge is met, schedule an automatic reset for single-win badges (not series badges)
+	// When a badge is met, show a non-blocking toast for the first-win badge
+	// (do NOT interrupt gameplay for this particular badge)
 	if (achievementKey === 'first-win') {
-		scheduleAutoReset();
+		try { showAchievementToast('First Badge Unlocked: You won your first game.', 0); } catch (e) { console.error(e); }
+		// do not schedule an auto-reset for first-win so gameplay continues uninterrupted
+	}
+}
+
+// Small non-blocking toast notification for achievement unlocks
+/**
+ * Displays a small, non-blocking toast message for an unlocked achievement.
+ *
+ * The toast is positioned near the game arena when possible, and falls back
+ * to a viewport overlay if the arena is not available. Only one toast is
+ * shown at a time; additional calls while a toast is visible are ignored.
+ *
+ * @param {string} message
+ *   Text content to display inside the toast.
+ * @param {number|{persistent?: boolean, duration?: number}} [duration=3500]
+ *   Controls how long the toast remains visible:
+ *   - If a number is provided, it is treated as a timeout in milliseconds
+ *     after which the toast will automatically dismiss.
+ *   - If an object is provided and `persistent` is `true`, the toast will not
+ *     auto-dismiss and must be removed by other logic.
+ *   - Passing `0` or another falsy numeric value is treated as a persistent
+ *     toast with no auto-dismiss timer.
+ */
+function showAchievementToast(message, duration = 3500) {
+	if (!document) return;
+	const id = 'achievement-toast';
+	// Avoid duplicate toasts
+	if (document.getElementById(id)) return;
+
+	const toast = document.createElement('div');
+	toast.id = id;
+	toast.setAttribute('role', 'status');
+	toast.setAttribute('aria-live', 'polite');
+	toast.textContent = message;
+
+	const arena = document.getElementById('game-arena');
+	const common = {
+		zIndex: 9999,
+		background: 'linear-gradient(180deg, rgba(0,224,255,0.12), rgba(3,5,14,0.9))',
+		color: 'var(--text-main, #fff)',
+		padding: '10px 14px',
+		borderRadius: '10px',
+		border: '1px solid rgba(0,224,255,0.25)',
+		boxShadow: '0 6px 20px rgba(0,0,0,0.6)',
+		fontWeight: '700',
+		fontSize: '0.95rem',
+		opacity: '0',
+		transition: 'opacity 300ms ease, transform 300ms ease'
+	};
+
+	// Determine whether this toast should be persistent (no auto-close; must be dismissed by user or code)
+	const isDurationObject = typeof duration === 'object' && duration !== null;
+	const isPersistent = isDurationObject ? !!duration.persistent : duration === 0;
+	// Auto-close only when given a positive numeric duration; 0 or options objects never auto-close
+	const autoCloseDuration = (!isDurationObject && typeof duration === 'number' && duration > 0) ? duration : null;
+
+	if (arena) {
+		// Create (or reuse) an overlay container that fills the arena and centers content.
+		let overlay = document.getElementById('achievement-toast-overlay');
+		if (!overlay) {
+			overlay = document.createElement('div');
+			overlay.id = 'achievement-toast-overlay';
+			Object.assign(overlay.style, {
+				position: 'absolute',
+				inset: '0',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				pointerEvents: 'none',
+				zIndex: 9998
+			});
+			arena.appendChild(overlay);
+		}
+
+		// Toast itself is not absolute; it's centered by the overlay's flexbox
+		Object.assign(toast.style, common, {
+			position: 'relative',
+			margin: '0 auto',
+			pointerEvents: isPersistent ? 'auto' : 'none'
+		});
+
+		overlay.appendChild(toast);
+		// Force reflow and animate in
+		void toast.offsetWidth;
+		toast.style.opacity = '1';
+		toast.style.transform = 'translateY(0)';
+	} else {
+		// Fallback: fixed bottom-right if arena not available
+		Object.assign(toast.style, {
+			position: 'fixed',
+			right: '18px',
+			bottom: '86px',
+			transform: 'translateY(6px)'
+		}, common);
+		if (!isPersistent) toast.style.pointerEvents = 'none';
+		else toast.style.pointerEvents = 'auto';
+
+		document.body.appendChild(toast);
+		void toast.offsetWidth;
+		toast.style.opacity = '1';
+		toast.style.transform = 'translateY(0)';
+	}
+
+	// If persistent, require a click to dismiss
+	function removeToast() {
+		toast.style.opacity = '0';
+		if (arena) toast.style.transform = 'translate(-50%, 6px)';
+		else toast.style.transform = 'translateY(6px)';
+		setTimeout(() => { try { toast.remove(); } catch (e) {} }, 320);
+	}
+
+	if (isPersistent) {
+		toast.addEventListener('click', removeToast);
+	}
+
+	if (autoCloseDuration) {
+		setTimeout(removeToast, autoCloseDuration);
+	}
+}
+
+// Remove achievement toast and its overlay (if present)
+function removeAchievementToast() {
+	try {
+		const toast = document.getElementById('achievement-toast');
+		if (toast) toast.remove();
+	} catch (e) {
+		console.error('removeAchievementToast: failed to remove toast', e);
+	}
+	try {
+		const overlay = document.getElementById('achievement-toast-overlay');
+		if (overlay) overlay.remove();
+	} catch (e) {
+		console.error('removeAchievementToast: failed to remove overlay', e);
 	}
 }
 
@@ -755,6 +889,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		choices.forEach((btn) => (btn.disabled = !enabled));
 		if (overlay) overlay.classList.toggle("hidden", !!enabled);
 		arena.classList.toggle("is-active", !!enabled);
+
+		// If gameplay is being enabled, remove any persistent achievement toast
+		if (enabled) {
+			try { removeAchievementToast(); } catch (e) { /* ignore */ }
+		}
 		if (statusEl) statusEl.textContent = enabled
 			? "Arena ready. Choose your element."
 			: "Select a game mode to begin.";
@@ -909,6 +1048,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	choices.forEach((btn) => {
 		btn.addEventListener("click", () => {
+			// If an achievement toast is visible, remove it when the player begins interacting
+			try { removeAchievementToast(); } catch (e) { /* ignore */ }
 			if (!seriesActive && targetWins !== null) {
 				if (statusEl) statusEl.textContent = "Series finished. Press Reset or pick another mode to play again.";
 				return;
