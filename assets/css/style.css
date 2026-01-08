@@ -1492,14 +1492,14 @@ body.light-mode .reset-btn:hover {
 
 /* Light-mode contrast: ensure button remains visible on pale backgrounds */
 body.light-mode .accordion-close {
-    background: rgba(0,0,0,0.12);
+    background: rgba(0,0,0,0.32);
     color: #ffffff;
-    border-color: rgba(0,0,0,0.08);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    border-color: rgba(0,0,0,0.24);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.16);
 }
 
 body.light-mode .accordion-close:hover {
-    background: rgba(0,0,0,0.16);
+    background: rgba(0,0,0,0.44);
 }
 
 .accordion-tabs {
