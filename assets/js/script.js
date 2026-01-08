@@ -4,13 +4,16 @@
 const toggle = document.getElementById("themeToggle");
 
 function toggleTheme() {
-    document.body.classList.toggle("light-mode");
+	const isLight = document.body.classList.toggle("light-mode");
+	if (toggle) toggle.setAttribute('aria-pressed', isLight ? 'true' : 'false');
 }
 
-toggle.addEventListener("click", toggleTheme);
-toggle.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") toggleTheme();
-});
+if (toggle) {
+	toggle.addEventListener("click", toggleTheme);
+	toggle.addEventListener("keydown", (e) => {
+		if (e.key === "Enter" || e.key === " ") toggleTheme();
+	});
+}
 
 /* =========================================================
    MODAL
@@ -41,12 +44,13 @@ function closeModal() {
     if (lastFocusedElement) lastFocusedElement.focus();
 }
 
-openBtn.addEventListener("click", openModal);
-closeBtn.addEventListener("click", closeModal);
-
-modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-});
+if (openBtn) openBtn.addEventListener("click", openModal);
+if (closeBtn) closeBtn.addEventListener("click", closeModal);
+if (modal) {
+	modal.addEventListener("click", (e) => {
+		if (e.target === modal) closeModal();
+	});
+}
 
 function openResultModal(playerWon, modeName) {
     if (!resultModal || !resultMessage || !resultSubtext) return;
@@ -70,7 +74,17 @@ function openResultModal(playerWon, modeName) {
 }
 
 function closeResultModal() {
-    if (resultModal) resultModal.classList.remove("open");
+	if (resultModal) resultModal.classList.remove("open");
+
+	// If an auto-reset was requested (series end or badge unlock), perform it now
+	if (pendingAutoReset) {
+		try {
+			performAutoReset();
+		} catch (e) {
+			console.error('Auto-reset after modal close failed', e);
+		}
+		pendingAutoReset = false;
+	}
 }
 
 if (closeResultBtn) {
@@ -81,6 +95,20 @@ if (resultModal) {
     resultModal.addEventListener("click", (e) => {
         if (e.target === resultModal) closeResultModal();
     });
+}
+
+// Accordion close button inside rules modal
+const accordionCloseBtn = document.getElementById('accordionClose');
+if (accordionCloseBtn) {
+	accordionCloseBtn.addEventListener('click', () => {
+		closeModal();
+	});
+	accordionCloseBtn.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			closeModal();
+		}
+	});
 }
 
 /* =========================================================
@@ -342,6 +370,94 @@ const ACHIEVEMENTS = {
 	'bo9': false
 };
 
+// When true, closing the result modal will also trigger an automatic reset.
+let pendingAutoReset = false;
+
+// Perform a safe UI + game-state reset from anywhere.
+function performAutoReset() {
+	try {
+		// Reset core scores/state
+		resetScore();
+
+		// Clear choice effects (best-effort without relying on inner-scope helpers)
+		const choices = Array.from(document.querySelectorAll('.arena-choice'));
+		for (const choiceBtn of choices) {
+			choiceBtn.classList.remove(
+				'is-player',
+				'is-opponent',
+				'result-win',
+				'result-lose',
+				'result-tie'
+			);
+			choiceBtn.disabled = true; // show overlay state until Play pressed
+		}
+
+		// Clear pick/symbol displays
+		const playerPickEl = document.getElementById('playerPick');
+		const cpuPickEl = document.getElementById('cpuPick');
+		const playerPickIcon = document.getElementById('playerPickIcon');
+		const cpuPickIcon = document.getElementById('cpuPickIcon');
+		const playerPickText = document.getElementById('playerPickText');
+		const cpuPickText = document.getElementById('cpuPickText');
+		const playerSymbolIcon = document.getElementById('playerSymbolIcon');
+		const cpuSymbolIcon = document.getElementById('cpuSymbolIcon');
+
+		if (playerPickEl) {
+			playerPickEl.removeAttribute('data-choice');
+			playerPickEl.classList.remove('result-win', 'result-lose', 'result-tie');
+		}
+		if (cpuPickEl) {
+			cpuPickEl.removeAttribute('data-choice');
+			cpuPickEl.classList.remove('result-win', 'result-lose', 'result-tie');
+		}
+		if (playerPickText) playerPickText.textContent = '—';
+		if (cpuPickText) cpuPickText.textContent = '—';
+		if (playerPickIcon) { playerPickIcon.hidden = true; playerPickIcon.src = ''; playerPickIcon.alt = ''; }
+		if (cpuPickIcon) { cpuPickIcon.hidden = true; cpuPickIcon.src = ''; cpuPickIcon.alt = ''; }
+		if (playerSymbolIcon) { playerSymbolIcon.hidden = true; playerSymbolIcon.src = ''; playerSymbolIcon.alt = ''; }
+		if (cpuSymbolIcon) { cpuSymbolIcon.hidden = true; cpuSymbolIcon.src = ''; cpuSymbolIcon.alt = ''; }
+
+		// Re-enable overlay / show Play overlay
+		const overlay = document.getElementById('arenaOverlay');
+		const arena = document.getElementById('game-arena');
+		if (overlay) overlay.classList.remove('hidden');
+		if (arena) arena.classList.remove('is-active');
+
+		// Update arena status to reflect current mode
+		const statusEl = document.getElementById('arenaStatus');
+		const config = MODE_CONFIG[gameMode] ?? MODE_CONFIG.continuous;
+		if (statusEl) statusEl.textContent = config.targetWins
+			? `${config.label}: first to ${config.targetWins} wins. Press Play to start.`
+			: 'Continuous play: press Play to start.';
+
+		// Clear any pending flag
+		pendingAutoReset = false;
+	} catch (e) {
+		console.error('performAutoReset error', e);
+	}
+}
+
+// Schedule an auto-reset: if a result modal is open, wait for it to be closed
+// otherwise perform a reset after a short delay so the player sees the unlock briefly.
+function scheduleAutoReset() {
+	// If the result modal is already open, perform reset on close
+	if (resultModal && resultModal.classList.contains('open')) {
+		pendingAutoReset = true;
+		return;
+	}
+
+	// If this achievement also finishes the active series, defer reset until modal close
+	if (targetWins !== null && playerScore >= (targetWins || 1)) {
+		pendingAutoReset = true;
+		return;
+	}
+
+	// Otherwise give a short pause then reset so the player sees the unlock briefly
+	setTimeout(() => {
+		performAutoReset();
+	}, 700);
+}
+
 function loadAchievements() {
 	const saved = localStorage.getItem('stormbound-achievements');
 	if (saved) {
@@ -364,6 +480,11 @@ function unlockAchievement(achievementKey) {
 	ACHIEVEMENTS[achievementKey] = true;
 	saveAchievements();
 	updateAchievementBadges();
+
+	// When a badge is met, schedule an automatic reset for single-win badges (not series badges)
+	if (achievementKey === 'first-win') {
+		scheduleAutoReset();
+	}
 }
 
 function updateAchievementBadges() {
@@ -381,29 +502,127 @@ function updateAchievementBadges() {
 // Load achievements on page load
 document.addEventListener('DOMContentLoaded', loadAchievements);
 
+// Badge progress utility (global scope so other functions can call it anytime)
+function updateBadgeProgress(mode) {
+	const progressContainer = document.getElementById('badgeProgress');
+	const progressLabel = document.getElementById('progressLabel');
+	const progressBar = document.getElementById('progressBar');
+	const progressFill = document.getElementById('progressFill');
+	if (!progressContainer || !progressBar || !progressFill || !progressLabel) return;
+	const config = MODE_CONFIG[mode] ?? MODE_CONFIG.continuous;
+	let key = null;
+	let target;
+	let numMarkers = 0;
+	let displayValue = 0;
+	let labelText = '';
+
+	if (mode === 'continuous') {
+		key = 'continuous';
+		// Continuous mode: progress reaches 100% after 10 player wins
+		const targetGames = 10;
+		numMarkers = 0; // no encouraging markers for continuous by default
+		displayValue = Math.min(100, Math.round((playerScore / targetGames) * 100));
+		labelText = `Continuous: ${playerScore}/${targetGames} games (${displayValue}%)`;
+	} else {
+		if (mode === 'bo3') key = 'bo3';
+		else if (mode === 'bo5') key = 'bo5';
+		else if (mode === 'bo9') key = 'bo9';
+		else key = 'first-win';
+		// For series modes, scale progress to target wins
+		target = config.targetWins || 1;
+		displayValue = Math.min(100, Math.round((playerScore / target) * 100));
+		labelText = `Progress to ${MODE_CONFIG[mode]?.label || mode}: ${playerScore}/${target} (${displayValue}%)`;
+		// number of markers equals target wins (e.g., bo3=2, bo5=3)
+		numMarkers = target;
+	}
+	progressLabel.textContent = labelText;
+	progressBar.setAttribute('aria-valuenow', String(displayValue));
+	progressFill.style.width = displayValue + '%';
+	progressContainer.style.display = 'block';
+	progressContainer.setAttribute('aria-hidden', 'false');
+
+	// Build dynamic markers based on the mode's target wins (bo3:2, bo5:3, bo9:5)
+	try {
+		const markersContainer = document.querySelector('.progress-markers');
+		if (markersContainer) {
+			// clear existing markers
+			markersContainer.innerHTML = '';
+			// Encouraging labels per mode
+			let labels = ["Keep Going","Great Job","Half Way!","Almost There","Hurray"];
+			if (mode === 'bo3') labels = ["Keep Going","Hurray"];
+			else if (mode === 'bo5') labels = ["Keep Going","Almost There","Hurray"];
+			else if (mode === 'bo9') labels = ["Keep Going","Great Job","Half Way!","Almost There","Hurray"];
+			// Use computed numMarkers (0 for continuous)
+			for (let i = 1; i <= numMarkers; i++) {
+				const pos = Math.round((i / (numMarkers + 1)) * 100);
+				const marker = document.createElement('div');
+				marker.className = 'marker';
+				marker.style.left = pos + '%';
+				const span = document.createElement('span');
+				span.textContent = labels[(i - 1) % labels.length] || '';
+				marker.appendChild(span);
+				markersContainer.appendChild(marker);
+			}
+
+			// Reveal/hide marker labels depending on progress
+			const markers = markersContainer.querySelectorAll('.marker');
+			markers.forEach((m) => {
+				const left = (m.style.left || '').trim();
+				if (!left || !left.endsWith('%')) return;
+				const percent = parseFloat(left.replace('%', '')) || 0;
+				if (displayValue >= percent - 1) m.classList.add('visible');
+				else m.classList.remove('visible');
+			});
+
+			// Update caption below the progress bar to reflect latest revealed label
+			try {
+				const captionEl = document.getElementById('progressCaption');
+				let captionText = '';
+				if (key === 'first-win') {
+					captionText = playerScore > 0 ? 'First Victory Unlocked!' : 'Win a match to earn your first badge.';
+				} else {
+					const visibleLabels = markersContainer.querySelectorAll('.marker.visible span');
+					if (visibleLabels.length > 0) {
+						captionText = visibleLabels[visibleLabels.length - 1].textContent || '';
+					} else {
+						captionText = labelText;
+					}
+				}
+				if (captionEl) captionEl.textContent = captionText;
+			} catch (e) {
+				console.error('progress caption update error', e);
+			}
+		}
+	} catch (e) {
+		console.error('progress markers update error', e);
+	}
+}
+
 function updateScore(result) {
 	if (!seriesActive && targetWins !== null) return;
+
+	// All match outcomes (win, lose, tie) increment the round counter
+	totalRounds += 1;
+
+	// Update player/computer scores based on match result
 	if (result === "win") {
 		playerScore += 1;
-		totalRounds += 1;
 		// Unlock first win achievement
 		unlockAchievement('first-win');
 	} else if (result === "lose") {
 		computerScore += 1;
-		totalRounds += 1;
-	} else if (result === "tie") {
-		// Ties should count as rounds played
-		totalRounds += 1;
 	}
+	// Note: tie results don't change scores, but round was already counted above
 	const scoreEl = document.getElementById("scoreValue");
 	if (scoreEl) scoreEl.textContent = playerScore;
 	const computerScoreEl = document.getElementById("computerScoreValue");
 	if (computerScoreEl) computerScoreEl.textContent = computerScore;
-	// Round displays show individual win counts per player
-	const playerRoundEl = document.getElementById("playerRoundValue");
-	if (playerRoundEl) playerRoundEl.textContent = playerScore;
-	const computerRoundEl = document.getElementById("computerRoundValue");
-	if (computerRoundEl) computerRoundEl.textContent = computerScore;
+	// Update round counter display
+	const roundEl = document.getElementById("roundValue");
+	if (roundEl) roundEl.textContent = totalRounds;
+
+	// Update progress bar to reflect current progress toward the active mode's badge
+	updateBadgeProgress(gameMode);
 }
 
 function resetScore() {
@@ -417,12 +636,18 @@ function resetScore() {
 	if (computerScoreEl) computerScoreEl.textContent = computerScore;
 	const roundEl = document.getElementById("roundValue");
 	if (roundEl) roundEl.textContent = totalRounds;
+
+	// Reset progress display when scores reset (guard in case function not yet defined)
+	if (typeof updateBadgeProgress === 'function') {
+		try { updateBadgeProgress(gameMode); } catch (e) { console.error('updateBadgeProgress error', e); }
+	}
 }
 
 /* =========================================================
    ARENA INITIALIZATION WITH LOCAL OVERLAY
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
+	console.debug('Arena initialization running');
 	const arena = document.getElementById("game-arena");
 	const overlay = document.getElementById("arenaOverlay");
 	const playBtn = document.getElementById("playButton");
@@ -539,11 +764,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	function setModeStatusMessage(config) {
 		if (!statusEl) return;
 		statusEl.textContent = config.targetWins
-			? `${config.label}: first to ${config.targetWins} wins. Choose your element to start.`
-			: "Continuous play: choose your element to start.";
+			? `${config.label}: first to ${config.targetWins} wins. Press Play to start.`
+			: "Continuous play: press Play to start.";
 	}
 
 	function updateModeUI(activeMode) {
+		console.debug('updateModeUI activeMode=', activeMode);
 		modeButtons.forEach((btn) => {
 			const isActive = btn.dataset.mode === activeMode;
 			btn.classList.toggle("is-active", isActive);
@@ -554,16 +780,23 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function setMode(nextMode, options = {}) {
-		const preserveActive = options.preserveActive ?? true;
+		console.debug('setMode called with', nextMode);
 		const config = MODE_CONFIG[nextMode] ?? MODE_CONFIG.continuous;
 		gameMode = nextMode;
 		targetWins = config.targetWins;
 		resetScore();
 		seriesActive = true;
-		updateModeUI(gameMode);
-		// Always activate arena when mode is selected
-		setArenaEnabled(true);
-		setModeStatusMessage(config);
+		try {
+			updateModeUI(gameMode);
+			setModeStatusMessage(config);
+
+			// Update badge progress UI for the selected mode
+			if (typeof updateBadgeProgress === 'function') {
+				try { updateBadgeProgress(gameMode); } catch (e) { console.error('updateBadgeProgress error', e); }
+			}
+		} catch (e) {
+			console.error('Error in setMode:', e);
+		}
 	}
 
 	function checkSeriesWinner() {
@@ -590,14 +823,17 @@ document.addEventListener("DOMContentLoaded", () => {
 			else if (gameMode === "bo9") unlockAchievement('bo9');
 		}
 		
+		// Request auto-reset once the user dismisses the result modal
+		pendingAutoReset = true;
+
 		// Show result modal with a slight delay for better UX
 		setTimeout(() => {
 			openResultModal(winner === "player", label);
 		}, 800);
 	}
 
-	// Initially active with default mode
-	setArenaEnabled(true);
+	// Initially disabled - show play overlay
+	setArenaEnabled(false);
 	updateModeUI(gameMode);
 	setModeStatusMessage(MODE_CONFIG[gameMode]);
 
@@ -605,6 +841,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		const firstChoice = arena.querySelector(".arena-choice");
 		if (firstChoice) firstChoice.focus();
 	}
+
+
+	// Initialize progress display on load (function defined in global scope)
+	updateBadgeProgress(gameMode);
 
 	if (playBtn) {
 		playBtn.addEventListener("click", () => {
@@ -626,6 +866,15 @@ document.addEventListener("DOMContentLoaded", () => {
 			// and reset the series, arena stays active
 			clearChoiceEffects();
 			setMode(btn.dataset.mode);
+		});
+
+		// Support keyboard activation (Enter / Space)
+		btn.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				clearChoiceEffects();
+				setMode(btn.dataset.mode);
+			}
 		});
 	});
 
@@ -737,8 +986,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			// Clear pick displays
 			clearPickDisplay();
 			
-			// Keep arena active
-			setArenaEnabled(true);
+			// Show play overlay again
+			setArenaEnabled(false);
 			setModeStatusMessage(MODE_CONFIG[gameMode]);
 		});
 	}

@@ -24,7 +24,7 @@
 <img src="assets/images/logo.png" alt="Game Logo" class="site-logo">
 
 <!-- Light Mode Toggle -->
-<div id="themeToggle" class="toggle-switch" role="button" tabindex="0">
+<div id="themeToggle" class="toggle-switch" role="button" tabindex="0" aria-pressed="false">
     <div class="toggle-circle"></div>
 </div>
 
@@ -52,6 +52,7 @@
 
                 <!-- RIGHT CONTENT -->
                 <div class="accordion-content">
+                    <button class="accordion-close" id="accordionClose" aria-label="Close">&times;</button>
 
                     <div class="content-section active" id="rules">
                         <h2>Rules</h2>
@@ -185,11 +186,11 @@
                         <p>
                             Earn points by beating the computer.<br>
                             A draw earns no points.<br>
-                            🥉 First Victory – Win any match
-                            🥈 Best of 3 Champion – Win a Best of 3 Round
-                            🥇 Best of 5 Champion – Win a Best of 5 Round
-                            👑 Endurance Master – Win a Best of 9 Round
-                            Hint: To win a round, win the majority of matches played!
+                            🥉 First Victory – Win any match <br>
+                            🥈 Best of 3 Champion – Win a Best of 3 Round<br>
+                            🥇 Best of 5 Champion – Win a Best of 5 Round<br>
+                            👑 Endurance Master – Win a Best of 9 Round<br>
+                            Hint: To win a round, win the majority of matches played! <br>
                             Good Luck!
                               </p>
                     </div>
@@ -227,7 +228,6 @@
 <!-- GAME ARENA (below rules button, above footer) -->
 <section id="game-arena" class="game-arena">
     <div class="arena-header">
-        <h3>Stormbound</h3>
             <div class="mode-toggle" role="group" aria-label="Select game mode">
                 <button class="mode-btn is-active" data-mode="continuous" aria-pressed="true">Continuous</button>
                 <button class="mode-btn" data-mode="bo3" aria-pressed="false">Best of 3</button>
@@ -291,12 +291,30 @@
         <p class="round-label">Round</p>
         <p class="round-display"><span id="roundValue">0</span></p>
     </div>
-    <button id="resetButton" class="reset-btn">Reset Game</button>
+    <!-- Arena footer: reset button and progress (stacked, non-overlapping) -->
+    <div class="arena-footer">
+        <button id="resetButton" class="reset-btn">Reset Game</button>
+        <div class="arena-progress-container" id="badgeProgress" aria-hidden="true">
+            <div class="arena-progress-inner">
+                <div class="arena-progress-label" id="progressLabel">Progress</div>
+                <div class="arena-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+                    <div class="arena-progress-fill" id="progressFill"></div>
+                    <div class="progress-markers"></div>
+                    <div class="progress-medal" aria-hidden="true">🏅</div>
+                </div>
+                <div class="arena-progress-caption" id="progressCaption" aria-live="polite">Ready</div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- ACHIEVEMENT BADGES -->
 <section class="achievements-section">
     <h3 class="achievements-title">Achievements</h3>
+    <p class="achievements-note">Badges are saved in your browser and persist across sessions.</p>
+
+    <!-- Progress moved into the arena footer for better visibility -->
+
     <div class="achievements-grid">
         <div class="achievement-badge" data-achievement="first-win" title="First Victory – Win any match">
             <div class="badge-icon">🥉</div>
