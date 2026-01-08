@@ -1263,6 +1263,21 @@ body.light-mode .reset-btn:hover {
     pointer-events: auto; /* intercept clicks until dismissed */
 }
 
+/* Decorative logo behind Play text (non-interactive) */
+.arena-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('../images/logo.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    /* Fill the arena area while preserving aspect ratio */
+    background-size: cover;
+    opacity: 0.3;
+    z-index: 1;
+    pointer-events: none;
+}
+
 /* Ensure the play overlay blocks the entire arena until activated */
 .game-arena:not(.is-active) .arena-overlay {
     display: flex;
@@ -1281,6 +1296,40 @@ body.light-mode .reset-btn:hover {
     padding: 18px 22px;
     color: var(--text-main);
     box-shadow: var(--shadow-soft);
+    position: relative;
+    z-index: 2; /* sit above the decorative logo */
+}
+
+/* Responsive tuning for the decorative overlay logo so it doesn't crop on small screens */
+@media (max-width: 900px) {
+    .arena-overlay::before {
+        /* prefer contain on narrower viewports so the full logo remains visible */
+        background-size: contain;
+        background-position: center 45%;
+        opacity: 0.18;
+    }
+}
+
+@media (max-width: 600px) {
+    .arena-overlay::before {
+        background-size: contain;
+        background-position: center 48%;
+        opacity: 0.14;
+    }
+    .arena-overlay {
+        background: radial-gradient(circle at top, rgba(15, 25, 60, 0.88) 0, rgba(3, 4, 10, 0.94) 60%);
+    }
+}
+
+@media (max-width: 480px) {
+    .arena-overlay::before {
+        background-size: contain;
+        background-position: center 52%;
+        opacity: 0.12;
+    }
+    .arena-overlay .overlay-inner {
+        padding: 12px 14px;
+    }
 }
 
 .arena-overlay.hidden {
