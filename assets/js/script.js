@@ -490,6 +490,24 @@ function unlockAchievement(achievementKey) {
 }
 
 // Small non-blocking toast notification for achievement unlocks
+/**
+ * Displays a small, non-blocking toast message for an unlocked achievement.
+ *
+ * The toast is positioned near the game arena when possible, and falls back
+ * to a viewport overlay if the arena is not available. Only one toast is
+ * shown at a time; additional calls while a toast is visible are ignored.
+ *
+ * @param {string} message
+ *   Text content to display inside the toast.
+ * @param {number|{persistent?: boolean, duration?: number}} [duration=3500]
+ *   Controls how long the toast remains visible:
+ *   - If a number is provided, it is treated as a timeout in milliseconds
+ *     after which the toast will automatically dismiss.
+ *   - If an object is provided and `persistent` is `true`, the toast will not
+ *     auto-dismiss and must be removed by other logic.
+ *   - Passing `0` or another falsy numeric value is treated as a persistent
+ *     toast with no auto-dismiss timer.
+ */
 function showAchievementToast(message, duration = 3500) {
 	if (!document) return;
 	const id = 'achievement-toast';
