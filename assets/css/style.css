@@ -1300,6 +1300,38 @@ body.light-mode .reset-btn:hover {
     z-index: 2; /* sit above the decorative logo */
 }
 
+/* Responsive tuning for the decorative overlay logo so it doesn't crop on small screens */
+@media (max-width: 900px) {
+    .arena-overlay::before {
+        /* prefer contain on narrower viewports so the full logo remains visible */
+        background-size: contain;
+        background-position: center 45%;
+        opacity: 0.18;
+    }
+}
+
+@media (max-width: 600px) {
+    .arena-overlay::before {
+        background-size: contain;
+        background-position: center 48%;
+        opacity: 0.14;
+    }
+    .arena-overlay {
+        background: radial-gradient(circle at top, rgba(15, 25, 60, 0.88) 0, rgba(3, 4, 10, 0.94) 60%);
+    }
+}
+
+@media (max-width: 480px) {
+    .arena-overlay::before {
+        background-size: contain;
+        background-position: center 52%;
+        opacity: 0.12;
+    }
+    .arena-overlay .overlay-inner {
+        padding: 12px 14px;
+    }
+}
+
 .arena-overlay.hidden {
     display: none;
 }
