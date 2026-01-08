@@ -427,8 +427,8 @@ function performAutoReset() {
 		const statusEl = document.getElementById('arenaStatus');
 		const config = MODE_CONFIG[gameMode] ?? MODE_CONFIG.continuous;
 		if (statusEl) statusEl.textContent = config.targetWins
-			? `${config.label}: first to ${config.targetWins} wins. Press Play to start.`
-			: 'Continuous play: press Play to start.';
+			? `${config.label}: first to ${config.targetWins} wins. Choose an Element to Start.`
+			: 'Continuous play: Choose an Element to start.';
 
 		// Clear any pending flag
 		pendingAutoReset = false;
