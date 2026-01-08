@@ -1449,31 +1449,56 @@ body.light-mode .reset-btn:hover {
 
 /* Close button inside accordion content */
 .accordion-close {
-    position: absolute;
-    top: clamp(8px, 2vw, 12px);
-    right: clamp(8px, 2vw, 12px);
+    /* default: keep in-flow so it doesn't float to viewport corners when placed outside the panel */
+    position: static;
     width: clamp(28px, 6vw, 36px);
     height: clamp(28px, 6vw, 36px);
     border-radius: 999px;
-    border: none;
-    background: rgba(0,0,0,0.25);
-    color: #fff;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.28);
+    color: #ffffff;
     font-size: clamp(18px, 4vw, 22px);
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 5;
+    z-index: 60; /* raise above nearby content */
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
 .accordion-close:hover {
-    background: rgba(255,255,255,0.06);
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.04);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.45);
 }
 
 .accordion-close:focus-visible {
     outline: 3px solid rgba(0, 224, 255, 0.55);
     outline-offset: 3px;
+}
+
+/* If the button markup does not include text, show a clear cross glyph for accessibility */
+.accordion-close:empty::before {
+    /* only inject glyph when the button has no inner text/icon */
+    content: "✕";
+    font-size: 1em;
+    line-height: 1;
+    display: block;
+    transform: translateY(-1px);
+}
+
+/* Light-mode contrast: ensure button remains visible on pale backgrounds */
+body.light-mode .accordion-close {
+    background: rgba(0,0,0,0.12);
+    color: #ffffff;
+    border-color: rgba(0,0,0,0.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+body.light-mode .accordion-close:hover {
+    background: rgba(0,0,0,0.16);
 }
 
 .accordion-tabs {
@@ -1500,9 +1525,18 @@ body.light-mode .reset-btn:hover {
 }
 
 .accordion-content {
+    position: relative; /* anchor for .accordion-close */
     border-radius: 20px;
     padding: 20px 24px;
     background: radial-gradient(circle at top left, rgba(0, 224, 255, 0.18) 0, rgba(3, 5, 14, 0.98) 52%);
+}
+
+/* Only position the close button absolutely when it is a child of the accordion content
+   This prevents the button from floating to the top-right of the viewport if it's rendered elsewhere. */
+.accordion-content .accordion-close {
+    position: absolute;
+    top: clamp(8px, 2vw, 12px);
+    right: clamp(8px, 2vw, 12px);
 }
 
 .content-section {
