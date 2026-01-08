@@ -484,14 +484,14 @@ function unlockAchievement(achievementKey) {
 	// When a badge is met, show a non-blocking toast for the first-win badge
 	// (do NOT interrupt gameplay for this particular badge)
 	if (achievementKey === 'first-win') {
-		try { showAchievementToast('First Badge Unlocked! You won your first game.'); } catch (e) { console.error(e); }
+		try { showAchievementToast('First Badge Unlocked! You won your first game.', 0); } catch (e) { console.error(e); }
 		// do not schedule an auto-reset for first-win so gameplay continues uninterrupted
 	}
 }
 
 // Small non-blocking toast notification for achievement unlocks
 function showAchievementToast(message, duration = 3500) {
-	if (!document || !document.body) return;
+	if (!document) return;
 	const id = 'achievement-toast';
 	// Avoid duplicate toasts
 	if (document.getElementById(id)) return;
@@ -501,10 +501,9 @@ function showAchievementToast(message, duration = 3500) {
 	toast.setAttribute('role', 'status');
 	toast.setAttribute('aria-live', 'polite');
 	toast.textContent = message;
-	Object.assign(toast.style, {
-		position: 'fixed',
-		right: '18px',
-		bottom: '86px',
+
+	const arena = document.getElementById('game-arena');
+	const common = {
 		zIndex: 9999,
 		background: 'linear-gradient(180deg, rgba(0,224,255,0.12), rgba(3,5,14,0.9))',
 		color: 'var(--text-main, #fff)',
@@ -512,26 +511,95 @@ function showAchievementToast(message, duration = 3500) {
 		borderRadius: '10px',
 		border: '1px solid rgba(0,224,255,0.25)',
 		boxShadow: '0 6px 20px rgba(0,0,0,0.6)',
-		pointerEvents: 'none',
 		fontWeight: '700',
 		fontSize: '0.95rem',
 		opacity: '0',
-		transition: 'opacity 300ms ease, transform 300ms ease',
-		transform: 'translateY(6px)'
-	});
+		transition: 'opacity 300ms ease, transform 300ms ease'
+	};
 
-	document.body.appendChild(toast);
-	// Force a reflow then animate in
-	/* eslint-disable no-unused-expressions */
-	void toast.offsetWidth;
-	toast.style.opacity = '1';
-	toast.style.transform = 'translateY(0)';
+	// Determine whether this toast should be persistent (user must click to dismiss)
+	const isPersistent = !!(duration === 0 || (typeof duration === 'object' && duration && duration.persistent));
+	// If duration is a number and >0, use that; if 0 and persistent, do not auto-close
+	const autoCloseDuration = (typeof duration === 'number' && duration > 0) ? duration : null;
 
-	setTimeout(() => {
+	if (arena) {
+		// Create (or reuse) an overlay container that fills the arena and centers content.
+		let overlay = document.getElementById('achievement-toast-overlay');
+		if (!overlay) {
+			overlay = document.createElement('div');
+			overlay.id = 'achievement-toast-overlay';
+			Object.assign(overlay.style, {
+				position: 'absolute',
+				inset: '0',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				pointerEvents: 'none',
+				zIndex: 9998
+			});
+			arena.appendChild(overlay);
+		}
+
+		// Toast itself is not absolute; it's centered by the overlay's flexbox
+		Object.assign(toast.style, common, {
+			position: 'relative',
+			margin: '0 auto',
+			pointerEvents: isPersistent ? 'auto' : 'none'
+		});
+
+		overlay.appendChild(toast);
+		// Force reflow and animate in
+		void toast.offsetWidth;
+		toast.style.opacity = '1';
+		toast.style.transform = 'translateY(0)';
+	} else {
+		// Fallback: fixed bottom-right if arena not available
+		Object.assign(toast.style, {
+			position: 'fixed',
+			right: '18px',
+			bottom: '86px',
+			transform: 'translateY(6px)'
+		}, common);
+		if (!isPersistent) toast.style.pointerEvents = 'none';
+		else toast.style.pointerEvents = 'auto';
+
+		document.body.appendChild(toast);
+		void toast.offsetWidth;
+		toast.style.opacity = '1';
+		toast.style.transform = 'translateY(0)';
+	}
+
+	// If persistent, require a click to dismiss
+	function removeToast() {
 		toast.style.opacity = '0';
-		toast.style.transform = 'translateY(6px)';
+		if (arena) toast.style.transform = 'translate(-50%, 6px)';
+		else toast.style.transform = 'translateY(6px)';
 		setTimeout(() => { try { toast.remove(); } catch (e) {} }, 320);
-	}, duration);
+	}
+
+	if (isPersistent) {
+		toast.addEventListener('click', removeToast);
+	}
+
+	if (autoCloseDuration) {
+		setTimeout(removeToast, autoCloseDuration);
+	}
+}
+
+// Remove achievement toast and its overlay (if present)
+function removeAchievementToast() {
+	try {
+		const toast = document.getElementById('achievement-toast');
+		if (toast) toast.remove();
+	} catch (e) {
+		console.error('removeAchievementToast: failed to remove toast', e);
+	}
+	try {
+		const overlay = document.getElementById('achievement-toast-overlay');
+		if (overlay) overlay.remove();
+	} catch (e) {
+		console.error('removeAchievementToast: failed to remove overlay', e);
+	}
 }
 
 function updateAchievementBadges() {
@@ -802,6 +870,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		choices.forEach((btn) => (btn.disabled = !enabled));
 		if (overlay) overlay.classList.toggle("hidden", !!enabled);
 		arena.classList.toggle("is-active", !!enabled);
+
+		// If gameplay is being enabled, remove any persistent achievement toast
+		if (enabled) {
+			try { removeAchievementToast(); } catch (e) { /* ignore */ }
+		}
 		if (statusEl) statusEl.textContent = enabled
 			? "Arena ready. Choose your element."
 			: "Select a game mode to begin.";
@@ -956,6 +1029,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	choices.forEach((btn) => {
 		btn.addEventListener("click", () => {
+			// If an achievement toast is visible, remove it when the player begins interacting
+			try { removeAchievementToast(); } catch (e) { /* ignore */ }
 			if (!seriesActive && targetWins !== null) {
 				if (statusEl) statusEl.textContent = "Series finished. Press Reset or pick another mode to play again.";
 				return;
