@@ -13,10 +13,13 @@
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <link rel="manifest" href="assets/images/site.webmanifest">
-
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <!-- Bootstrap  -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
+
 </head>
 
 <body class="page-wrapper">
@@ -75,11 +78,11 @@
                                 <h2>Elements</h2>
                                 <p>The winner is determined based on the following rules:</p>
 
-                                <button class="sub-header active" data-element="water" aria-expanded="true">Water <img src="assets/images/water.png"></button>
-                                <button class="sub-header" data-element="fire" aria-expanded="false">Fire <img src="assets/images/fire.png"></button>
-                                <button class="sub-header" data-element="earth" aria-expanded="false">Earth <img src="assets/images/earth.png"></button>
-                                <button class="sub-header" data-element="air" aria-expanded="false">Air <img src="assets/images/air.png"></button>
-                                <button class="sub-header" data-element="lightning" aria-expanded="false">Lightning <img src="assets/images/lightning.png"></button>
+                                <button class="sub-header active" data-element="water" aria-expanded="true">Water <img src="assets/images/water.png" alt=""></button>
+                                <button class="sub-header" data-element="fire" aria-expanded="false">Fire <img src="assets/images/fire.png" alt=""></button>
+                                <button class="sub-header" data-element="earth" aria-expanded="false">Earth <img src="assets/images/earth.png" alt=""></button>
+                                <button class="sub-header" data-element="air" aria-expanded="false">Air <img src="assets/images/air.png" alt=""></button>
+                                <button class="sub-header" data-element="lightning" aria-expanded="false">Lightning <img src="assets/images/lightning.png" alt=""></button>
                             </div>
 
                             <div class="elements-content">
@@ -210,7 +213,7 @@
     </div>
 
     <!-- ELEMENT ICON NAVIGATION -->
-    <div class="element-icons" aria-label="Element win/loss chart">
+    <div class="element-icons" role="group" aria-label="Element win/loss chart">
         <img class="element-icon" src="assets/images/lightning.png" alt="Lightning" data-element="lightning">
         <img class="element-icon" src="assets/images/fire.png" alt="Fire" data-element="fire">
         <img class="element-icon" src="assets/images/air.png" alt="Air" data-element="air">
@@ -238,9 +241,9 @@
         <p>Select an element to challenge the computer.</p>
     </div>
     <!-- Local arena overlay with Play button -->
-    <div id="arenaOverlay" class="arena-overlay" aria-label="Activate Game">
+    <div id="arenaOverlay" class="arena-overlay" role="dialog" aria-label="Activate Game">
         <div class="overlay-inner">
-            <h4>Ready to Play?</h4>
+            <h3>Ready to Play?</h3>
             <button id="playButton" class="play-btn" aria-controls="game-arena">Play</button>
         </div>
     </div>
@@ -252,11 +255,11 @@
         <button class="arena-choice" data-choice="lightning"><img src="assets/images/lightning.png" alt="" aria-hidden="true"> Lightning</button>
     </div>
 
-    <div class="arena-picks" aria-label="Round selections">
+    <div class="arena-picks" role="group" aria-label="Round selections">
         <div class="arena-pick arena-pick--player" id="playerPick" aria-live="polite">
             <div class="arena-pick__label">You</div>
             <div class="arena-pick__value">
-                <img id="playerPickIcon" class="arena-pick__icon" src="" alt="" hidden>
+                <img id="playerPickIcon" class="arena-pick__icon" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Hidden player symbol" hidden>
                 <span id="playerPickText">—</span>
             </div>
         </div>
@@ -264,18 +267,18 @@
         <div class="arena-pick arena-pick--cpu" id="cpuPick" aria-live="polite">
             <div class="arena-pick__label">Computer</div>
             <div class="arena-pick__value">
-                <img id="cpuPickIcon" class="arena-pick__icon" src="" alt="" hidden>
+                <img id="cpuPickIcon" class="arena-pick__icon" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Hidden player symbol" hidden>
                 <span id="cpuPickText">—</span>
             </div>
         </div>
     </div>
 
-    <div class="arena-symbols" aria-label="Chosen symbols">
+    <div class="arena-symbols" role="group" aria-label="Chosen symbols">
         <div class="arena-symbol arena-symbol--player" id="playerSymbol" aria-live="polite">
-            <img id="playerSymbolIcon" class="arena-symbol__icon" src="" alt="" hidden>
+            <img id="playerSymbolIcon" class="arena-symbol__icon" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Hidden player symbol" hidden>
         </div>
         <div class="arena-symbol arena-symbol--cpu" id="cpuSymbol" aria-live="polite">
-            <img id="cpuSymbolIcon" class="arena-symbol__icon" src="" alt="" hidden>
+            <img id="cpuSymbolIcon" class="arena-symbol__icon" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Hidden player symbol" hidden>
         </div>
     </div>
     <div class="arena-status" id="arenaStatus" aria-live="polite"></div>
@@ -352,6 +355,9 @@
     </div>
 </footer>
 
+<!-- Bootstrap JavaScript Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<!-- Custom JS script -->
 <script src="assets/js/script.js"></script>
 
 </body>
