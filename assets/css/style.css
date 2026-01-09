@@ -1093,8 +1093,8 @@ body.light-mode .reset-btn:hover {
 }
 
 .arena-symbol__icon {
-    width: 70px;
-    height: 70px;
+    width: clamp(80px, 18vw, 160px);
+    height: clamp(80px, 18vw, 160px);
     object-fit: contain;
     filter: drop-shadow(0 0 16px rgba(0, 0, 0, 0.65));
     transform-origin: center;
