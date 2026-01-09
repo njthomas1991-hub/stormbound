@@ -107,7 +107,7 @@ body.page-wrapper {
 }
 
 /* Lock page scroll to visual viewport */
-html, body { height: 100%; overflow: hidden; }
+html, body { height: auto; overflow-y: auto; }
 
 /* Controlled scroll container for all content */
 .app-root {
@@ -290,11 +290,12 @@ body.light-mode .rules-btn:hover {
     max-width: 95vw;
     min-height: 100dvh;
     height: auto;
+    max-height: none;
     margin: clamp(12px, 3vw, 16px) auto;
     background: radial-gradient(circle at top left, rgba(0, 224, 255, 0.18) 0, rgba(3, 5, 14, 0.98) 52%);
     border-radius: clamp(12px, 3vw, 20px);
     padding: clamp(16px, 4vw, 26px);
-    padding-bottom: calc(var(--arena-footer-height));
+    padding-bottom: 160px;
     flex: 1 1 auto;
 }
     
@@ -473,9 +474,9 @@ body.light-mode .mode-btn.is-active {
     .game-arena {
         width: 100vw;
         height: auto;
-        min-height: 100dvh; /* fixes iOS Safari too */
         margin: 0 auto;
         border-radius: 0;
+        padding-bottom: 180px
         padding-bottom: calc(var(--arena-footer-height));
 
     }
