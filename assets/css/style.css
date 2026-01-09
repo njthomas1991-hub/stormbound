@@ -23,7 +23,77 @@
     --transition-med: 220ms ease-out;
     --glass-blur: blur(18px);
     --arena-footer-height: 140px;
+    /* Mobile-safe viewport helpers */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ========== LAYOUT UTILITIES: MOBILE-PROOF & REUSABLE ========== */
+/* Flex-stack full viewport container (accounts dynamic viewport height on mobile) */
+.u-viewport {
+    min-height: 100dvh;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: var(--safe-bottom); /* avoid notch overlap */
+}
+
+/* Content area inside flex-stack; prevents overflow issues while allowing growth */
+.u-content {
+    flex: 1 0 auto;
+    min-height: 0;
+}
+
+/* Sticky footer that sits at the bottom of the scroll context */
+.u-footer-sticky {
+    position: sticky;
+    bottom: 0;
+    padding-bottom: var(--safe-bottom);
+}
+
+/* Fixed footer that adheres to the viewport bottom; reserve space in the parent with .u-reserve-footer-space */
+.u-footer-fixed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-bottom: var(--safe-bottom);
+    z-index: 100;
+}
+
+/* Reserve footer space without absolute/fixed padding hacks */
+.u-reserve-footer-space {
+    /* use your footer height variable for consistency */
+    padding-bottom: var(--arena-footer-height);
+}
+
+/* Grid pattern with a dedicated bottom row; avoids absolute positioning for controls */
+.u-viewport-grid {
+    min-height: 100dvh;
+    height: auto;
+    display: grid;
+    grid-template-rows: auto 1fr var(--arena-footer-height);
+}
+
+.u-bottom-row {
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* or center */
+    gap: 12px;
+    padding-bottom: var(--safe-bottom);
+}
+
+/* Bottom-controls alignment helpers (left/center/right) */
+.u-bottom-left { justify-content: flex-start; }
+.u-bottom-center { justify-content: center; }
+.u-bottom-right { justify-content: flex-end; }
+
+/* Usage examples (apply to containers without changing existing markup):
+   - Wrap page in .u-viewport and inner main in .u-content for robust full-height behavior.
+   - For a fixed footer: add .u-reserve-footer-space to the parent and .u-footer-fixed to the footer.
+   - For bottom controls: use .u-viewport-grid on the arena container and place controls inside a child with .u-bottom-row.
+*/
 
 body.page-wrapper {
     margin: 0;
