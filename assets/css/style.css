@@ -103,7 +103,12 @@ body.page-wrapper {
     background: radial-gradient(circle at top, #1b2547 0, #05060b 52%, #020308 100%);
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* lock page scroll to visual viewport */
+    overscroll-behavior: none; /* prevent scroll chaining/bounce */
 }
+
+/* Ensure the root participates in full-height layout for mobile */
+html { height: 100%; }
 
 /* ========== NEW: SITE LOGO (MOVED FROM FOOTER) ========== */
 .site-logo {
