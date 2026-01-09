@@ -111,9 +111,10 @@ html, body { height: 100%; overflow: hidden; }
 
 /* Controlled scroll container for all content */
 .app-root {
-    height: 100dvh;
+    flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    min-height: 0; /* allow flex shrinking below content */
 }
 
 /* ========== NEW: SITE LOGO (MOVED FROM FOOTER) ========== */
