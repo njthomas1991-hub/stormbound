@@ -212,7 +212,7 @@ body.light-mode .rules-btn:hover {
     background: radial-gradient(circle at top left, rgba(0, 224, 255, 0.18) 0, rgba(3, 5, 14, 0.98) 52%);
     border-radius: clamp(12px, 3vw, 20px);
     padding: clamp(16px, 4vw, 26px);
-    padding-bottom: calc(var(--arena-footer-height) + 16px);
+    padding-bottom: calc(var(--arena-footer-height));
     flex: 1 1 auto;
 }
     
@@ -394,7 +394,7 @@ body.light-mode .mode-btn.is-active {
         min-height: 100dvh; /* fixes iOS Safari too */
         margin: 0 auto;
         border-radius: 0;
-        padding-bottom: clamp(180px, 24vw, 220px);
+        padding-bottom: calc(var(--arena-footer-height));
 
     }
 
@@ -1054,7 +1054,7 @@ body.light-mode .reset-btn:hover {
 
     .game-arena {
         padding: 12px;
-        padding-bottom: 220px;
+        padding-bottom: calc(var(--arena-footer-height));
         margin: 0;
         width: 100vw;
         max-width: 100vw;
