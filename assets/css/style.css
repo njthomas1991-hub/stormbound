@@ -1002,8 +1002,8 @@ body.light-mode .reset-btn:hover {
 
 @media (max-width: 600px) {
     .arena-symbol {
-        height: 15vh;
-        min-height: 15vh;
+        height: 30vh;
+        min-height: 30vh;
         grid-template-rows: auto 1fr;
         justify-items: center;
         gap: 4px;
